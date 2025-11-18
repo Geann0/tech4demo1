@@ -25,6 +25,12 @@ export default function ProfileSidebar({ profile }: ProfileSidebarProps) {
       description: "Resumo da sua conta",
     },
     {
+      icon: "🛒",
+      label: "Carrinho",
+      href: "/carrinho",
+      description: "Seus produtos",
+    },
+    {
       icon: "◈",
       label: "Dados Pessoais",
       href: "/conta/dados",

@@ -35,10 +35,12 @@ export default function ProductDetailsClient({
   useEffect(() => {
     // Verificar sessão inicial
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       setIsAuthenticated(!!session?.user);
     };
-    
+
     checkAuth();
 
     // Escutar mudanças de autenticação

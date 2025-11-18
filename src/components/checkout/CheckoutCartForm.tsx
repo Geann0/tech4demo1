@@ -48,7 +48,7 @@ export default function CheckoutCartForm({
 }: {
   userEmail?: string;
 }) {
-  const { cart, clearCart } = useCart();
+  const { cart, clearCart, selectedItems, selectedTotal, hasSelectedItems } = useCart();
   const router = useRouter();
   const initialState = { error: null, success: false, paymentUrl: undefined };
   const [state, formAction] = useFormState(processCartCheckout, initialState);
@@ -64,14 +64,14 @@ export default function CheckoutCartForm({
     city: "",
     state: "",
   });
-  const [shipping, setShipping] = useState(calculateShipping("", cart.total));
+  const [shipping, setShipping] = useState(calculateShipping("", selectedTotal));
 
-  // Redirecionar se carrinho vazio
+  // Redirecionar se não há itens selecionados
   useEffect(() => {
-    if (cart.items.length === 0) {
+    if (!hasSelectedItems) {
       router.push("/carrinho");
     }
-  }, [cart.items.length, router]);
+  }, [hasSelectedItems, router]);
 
   // Carregar dados salvos
   useEffect(() => {
@@ -390,7 +390,7 @@ export default function CheckoutCartForm({
           <div className="p-6 space-y-4">
             {/* Lista de produtos */}
             <div className="space-y-3 max-h-60 overflow-y-auto">
-              {cart.items.map((item) => (
+              {selectedItems.map((item) => (
                 <div key={item.product_id} className="flex gap-3 items-center">
                   <div className="relative w-16 h-16 flex-shrink-0 bg-gray-900 rounded">
                     <Image
