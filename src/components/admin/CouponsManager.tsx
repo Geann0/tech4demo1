@@ -357,9 +357,7 @@ export default function CouponsManager({
 
               <div className="flex gap-2">
                 <button
-                  onClick={() =>
-                    handleToggleStatus(coupon.id, coupon.status)
-                  }
+                  onClick={() => handleToggleStatus(coupon.id, coupon.status)}
                   className="flex-1 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition text-sm flex items-center justify-center gap-2"
                 >
                   {coupon.status === "active" ? (

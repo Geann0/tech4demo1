@@ -162,7 +162,8 @@ export async function emitNFeIO(data: NFERequest): Promise<NFEResponse> {
   if (!apiKey || !companyId) {
     return {
       success: false,
-      error: "NFe.io não configurado (faltam NFE_IO_API_KEY e NFE_IO_COMPANY_ID)",
+      error:
+        "NFe.io não configurado (faltam NFE_IO_API_KEY e NFE_IO_COMPANY_ID)",
     };
   }
 
@@ -172,12 +173,11 @@ export async function emitNFeIO(data: NFERequest): Promise<NFEResponse> {
     return { success: false, error: "CPF ou CNPJ obrigatório" };
   }
 
-  const isValidDoc =
-    data.cliente.cpf
-      ? validaCPF(data.cliente.cpf)
-      : data.cliente.cnpj
-        ? validaCNPJ(data.cliente.cnpj)
-        : false;
+  const isValidDoc = data.cliente.cpf
+    ? validaCPF(data.cliente.cpf)
+    : data.cliente.cnpj
+      ? validaCNPJ(data.cliente.cnpj)
+      : false;
 
   if (!isValidDoc) {
     return {
@@ -252,7 +252,10 @@ export async function emitNFeIO(data: NFERequest): Promise<NFEResponse> {
               : "WALLET",
     };
 
-    console.log("📤 Enviando NF-e para NFe.io:", JSON.stringify(payload, null, 2));
+    console.log(
+      "📤 Enviando NF-e para NFe.io:",
+      JSON.stringify(payload, null, 2)
+    );
 
     const response = await fetch(
       `https://api.nfe.io/v1/companies/${companyId}/serviceinvoices`,
@@ -321,12 +324,11 @@ export async function emitBling(data: NFERequest): Promise<NFEResponse> {
     return { success: false, error: "CPF ou CNPJ obrigatório" };
   }
 
-  const isValidDoc =
-    data.cliente.cpf
-      ? validaCPF(data.cliente.cpf)
-      : data.cliente.cnpj
-        ? validaCNPJ(data.cliente.cnpj)
-        : false;
+  const isValidDoc = data.cliente.cpf
+    ? validaCPF(data.cliente.cpf)
+    : data.cliente.cnpj
+      ? validaCNPJ(data.cliente.cnpj)
+      : false;
 
   if (!isValidDoc) {
     return {

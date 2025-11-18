@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabaseClient";
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
 import CheckoutCartForm from "@/components/checkout/CheckoutCartForm";
 
 export const metadata = {
@@ -9,7 +10,7 @@ export const metadata = {
 
 export default async function CheckoutPage() {
   // Verificar autenticação (opcional - pode permitir checkout como convidado)
-  const supabase = createClient();
+  const supabase = createServerComponentClient({ cookies });
   const {
     data: { user },
   } = await supabase.auth.getUser();

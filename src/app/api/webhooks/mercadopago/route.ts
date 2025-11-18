@@ -16,9 +16,10 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: NextRequest) {
   // 🔒 RATE LIMITING: Proteger contra flood de webhooks
-  const ip = request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip");
+  const ip =
+    request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip");
   const identifier = getWebhookIdentifier(ip, undefined); // Será atualizado com payment_id depois
-  
+
   const rateLimit = checkRateLimit(identifier, {
     maxRequests: 50, // 50 requests por minuto por IP
     windowMs: 60 * 1000,
@@ -27,17 +28,17 @@ export async function POST(request: NextRequest) {
   if (!rateLimit.allowed) {
     console.warn(`⚠️ Rate limit excedido para ${identifier}`);
     return NextResponse.json(
-      { 
+      {
         error: "Too many requests",
-        resetTime: new Date(rateLimit.resetTime).toISOString() 
+        resetTime: new Date(rateLimit.resetTime).toISOString(),
       },
-      { 
+      {
         status: 429,
         headers: {
           "X-RateLimit-Limit": "50",
           "X-RateLimit-Remaining": "0",
           "X-RateLimit-Reset": rateLimit.resetTime.toString(),
-        }
+        },
       }
     );
   }

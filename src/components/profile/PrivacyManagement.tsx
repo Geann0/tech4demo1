@@ -56,12 +56,9 @@ export default function PrivacyManagement({
 
       if (result.success && result.data) {
         // Criar link de download
-        const blob = new Blob(
-          [Buffer.from(result.data, "base64").toString()],
-          {
-            type: "application/json",
-          }
-        );
+        const blob = new Blob([Buffer.from(result.data, "base64").toString()], {
+          type: "application/json",
+        });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
@@ -203,9 +200,7 @@ export default function PrivacyManagement({
           {/* Excluir conta */}
           <div className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition">
             <Trash2 className="w-8 h-8 text-red-500 mb-3" />
-            <h3 className="font-semibold text-lg mb-2">
-              Excluir Minha Conta
-            </h3>
+            <h3 className="font-semibold text-lg mb-2">Excluir Minha Conta</h3>
             <p className="text-sm text-gray-600 mb-4">
               Solicite a exclusão permanente da sua conta e anonimização dos
               seus dados.
@@ -298,9 +293,7 @@ export default function PrivacyManagement({
         </h2>
         <div className="space-y-3">
           {consentHistory.length === 0 ? (
-            <p className="text-gray-500 text-sm">
-              Nenhum histórico disponível
-            </p>
+            <p className="text-gray-500 text-sm">Nenhum histórico disponível</p>
           ) : (
             consentHistory.map((item, index) => (
               <div
@@ -341,9 +334,7 @@ export default function PrivacyManagement({
                   disabled={isDeleting}
                   className="w-full bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-600 disabled:opacity-50 transition"
                 >
-                  {isDeleting
-                    ? "Processando..."
-                    : "Sim, Excluir Minha Conta"}
+                  {isDeleting ? "Processando..." : "Sim, Excluir Minha Conta"}
                 </button>
                 <button
                   onClick={() => setShowDeleteConfirm(false)}

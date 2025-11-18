@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabaseClient";
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
 import CouponsManager from "@/components/admin/CouponsManager";
 
 export const metadata: Metadata = {
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default async function CouponsPage() {
-  const supabase = await createClient();
+  const supabase = createServerComponentClient({ cookies });
 
   const {
     data: { user },

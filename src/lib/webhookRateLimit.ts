@@ -68,7 +68,7 @@ export function checkRateLimit(
  */
 export function cleanupExpiredEntries(): void {
   const now = Date.now();
-  
+
   Array.from(rateLimitStore.entries()).forEach(([key, entry]) => {
     if (now > entry.resetTime) {
       rateLimitStore.delete(key);
@@ -87,7 +87,7 @@ export function getWebhookIdentifier(
   if (paymentId) {
     return `payment:${paymentId}`;
   }
-  
+
   return `ip:${ip || "unknown"}`;
 }
 

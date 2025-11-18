@@ -17,7 +17,7 @@ export function generateCSRFToken(): string {
 export async function setCSRFToken(): Promise<string> {
   const token = generateCSRFToken();
   const cookieStore = await cookies();
-  
+
   cookieStore.set(CSRF_TOKEN_NAME, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
@@ -25,7 +25,7 @@ export async function setCSRFToken(): Promise<string> {
     maxAge: 60 * 60 * 24, // 24 horas
     path: "/",
   });
-  
+
   return token;
 }
 
@@ -48,7 +48,7 @@ export async function validateCSRFToken(
   }
 
   const cookieToken = await getCSRFToken();
-  
+
   if (!cookieToken) {
     return false;
   }
@@ -65,7 +65,7 @@ export async function validateCSRFToken(
  */
 export async function requireCSRF(request: Request): Promise<void> {
   const method = request.method;
-  
+
   // Apenas valida em métodos de modificação
   if (!["POST", "PUT", "DELETE", "PATCH"].includes(method)) {
     return;
@@ -84,10 +84,10 @@ export async function requireCSRF(request: Request): Promise<void> {
  */
 export async function getCSRFTokenForForm(): Promise<string> {
   let token = await getCSRFToken();
-  
+
   if (!token) {
     token = await setCSRFToken();
   }
-  
+
   return token;
 }

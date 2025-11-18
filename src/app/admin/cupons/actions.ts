@@ -34,14 +34,13 @@ export async function createCoupon(formData: FormData) {
       (formData.get("min_purchase_amount") as string) || "0"
     );
     const maxDiscountAmount =
-      formData.get("max_discount_amount") as string || null;
-    const usageLimit = formData.get("usage_limit") as string || null;
+      (formData.get("max_discount_amount") as string) || null;
+    const usageLimit = (formData.get("usage_limit") as string) || null;
     const usageLimitPerUser = parseInt(
       formData.get("usage_limit_per_user") as string
     );
     const validUntil = formData.get("valid_until") as string;
-    const firstPurchaseOnly =
-      formData.get("first_purchase_only") === "true";
+    const firstPurchaseOnly = formData.get("first_purchase_only") === "true";
 
     const { error } = await supabase.from("coupons").insert({
       code: code.toUpperCase().trim(),
@@ -106,8 +105,7 @@ export async function updateCouponStatus(couponId: string, status: string) {
     console.error("Erro ao atualizar cupom:", error);
     return {
       success: false,
-      error:
-        error instanceof Error ? error.message : "Erro ao atualizar cupom",
+      error: error instanceof Error ? error.message : "Erro ao atualizar cupom",
     };
   }
 }
@@ -124,7 +122,10 @@ export async function deleteCoupon(couponId: string) {
   }
 
   try {
-    const { error } = await supabase.from("coupons").delete().eq("id", couponId);
+    const { error } = await supabase
+      .from("coupons")
+      .delete()
+      .eq("id", couponId);
 
     if (error) throw error;
 
@@ -172,9 +173,7 @@ export async function getCouponUsage(couponId: string) {
     return {
       success: false,
       error:
-        error instanceof Error
-          ? error.message
-          : "Erro ao buscar histórico",
+        error instanceof Error ? error.message : "Erro ao buscar histórico",
     };
   }
 }
