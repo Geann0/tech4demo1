@@ -134,6 +134,16 @@ export default function CheckoutForm({ product }: { product: Product }) {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Coluna Principal - Formulário */}
       <div className="lg:col-span-2 space-y-6">
+        <form action={formAction} className="space-y-6">
+          <input type="hidden" name="productId" value={product.id} />
+          <input type="hidden" name="productName" value={product.name} />
+          <input type="hidden" name="productPrice" value={product.price} />
+          <input type="hidden" name="slug" value={product.slug} />
+          <input type="hidden" name="partnerId" value={product.partner_id || ""} />
+          <input type="hidden" name="partnerName" value={product.partner_name || "Tech4Loop"} />
+          <input type="hidden" name="paymentMethod" value={paymentMethod} />
+          <input type="hidden" name="saveData" value={saveData ? "true" : "false"} />
+
         {/* Card de Informações Pessoais */}
         <div className="bg-dark-card border border-gray-800 rounded-xl overflow-hidden">
           <div className="bg-gradient-to-r from-gray-900 to-gray-800 px-6 py-4 border-b border-gray-700">
@@ -143,15 +153,7 @@ export default function CheckoutForm({ product }: { product: Product }) {
             </h3>
           </div>
           
-          <form action={formAction} className="p-6 space-y-4">
-            <input type="hidden" name="productId" value={product.id} />
-            <input type="hidden" name="productName" value={product.name} />
-            <input type="hidden" name="productPrice" value={product.price} />
-            <input type="hidden" name="slug" value={product.slug} />
-            <input type="hidden" name="partnerId" value={product.partner_id || ""} />
-            <input type="hidden" name="partnerName" value={product.partner_name || "Tech4Loop"} />
-            <input type="hidden" name="paymentMethod" value={paymentMethod} />
-            <input type="hidden" name="saveData" value={saveData ? "true" : "false"} />
+          <div className="p-6 space-y-4">
 
             {/* Nome e Email em Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -434,7 +436,7 @@ export default function CheckoutForm({ product }: { product: Product }) {
           </div>
         )}
       </form>
-    </div>
+      </div>
 
       {/* Coluna Lateral - Resumo do Pedido */}
       <div className="lg:col-span-1">
