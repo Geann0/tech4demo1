@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabaseClient";
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
 import PrivacyManagement from "@/components/profile/PrivacyManagement";
 
 export const metadata: Metadata = {
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default async function PrivacyPage() {
-  const supabase = await createClient();
+  const supabase = createServerComponentClient({ cookies });
 
   const {
     data: { user },

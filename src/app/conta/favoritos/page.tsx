@@ -1,10 +1,11 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabaseClient";
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
 import ProfileSidebar from "@/components/profile/ProfileSidebar";
 import FavoritesList from "@/components/profile/FavoritesList";
 
 export default async function FavoritosPage() {
-  const supabase = createClient();
+  const supabase = createServerComponentClient({ cookies });
 
   const {
     data: { user },

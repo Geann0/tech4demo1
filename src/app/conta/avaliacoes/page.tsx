@@ -1,11 +1,12 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabaseClient";
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
 import ProfileSidebar from "@/components/profile/ProfileSidebar";
 import ReviewsList from "@/components/profile/ReviewsList";
 import type { Review } from "./actions";
 
 export default async function AvaliacoesPage() {
-  const supabase = createClient();
+  const supabase = createServerComponentClient({ cookies });
 
   const {
     data: { user },

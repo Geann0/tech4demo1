@@ -105,8 +105,7 @@ export async function exportUserData() {
     console.error("❌ Erro ao exportar dados:", error);
     return {
       success: false,
-      error:
-        error instanceof Error ? error.message : "Erro ao exportar dados",
+      error: error instanceof Error ? error.message : "Erro ao exportar dados",
     };
   }
 }
@@ -140,14 +139,17 @@ export async function requestAccountDeletion() {
     if (logError) throw logError;
 
     // Anonimizar dados imediatamente (não excluir por questões legais/fiscais)
-    const { error: updateError } = await supabase.from("profiles").update({
-      full_name: "[DADOS REMOVIDOS]",
-      phone: null,
-      cpf: null,
-      birth_date: null,
-      addresses: [],
-      lgpd_consent: false,
-    }).eq("id", user.id);
+    const { error: updateError } = await supabase
+      .from("profiles")
+      .update({
+        full_name: "[DADOS REMOVIDOS]",
+        phone: null,
+        cpf: null,
+        birth_date: null,
+        addresses: [],
+        lgpd_consent: false,
+      })
+      .eq("id", user.id);
 
     if (updateError) throw updateError;
 
@@ -164,7 +166,9 @@ export async function requestAccountDeletion() {
     return {
       success: false,
       error:
-        error instanceof Error ? error.message : "Erro ao processar solicitação",
+        error instanceof Error
+          ? error.message
+          : "Erro ao processar solicitação",
     };
   }
 }
@@ -211,7 +215,9 @@ export async function updateConsent(consent: {
     return {
       success: false,
       error:
-        error instanceof Error ? error.message : "Erro ao atualizar preferências",
+        error instanceof Error
+          ? error.message
+          : "Erro ao atualizar preferências",
     };
   }
 }
