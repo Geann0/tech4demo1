@@ -5,6 +5,7 @@ import { Resend } from "resend";
 import NewOrderEmail from "@/components/emails/NewOrderEmail";
 import crypto from "crypto";
 import { emitNFe } from "@/lib/nfe-integration";
+import { rateLimit } from "@/lib/rateLimit";
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -13,7 +14,25 @@ const supabaseAdmin = createClient(
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+// ✅ RATE LIMITING: Máximo 10 requisições por minuto por IP
+const webhookLimiter = rateLimit({
+  interval: 60 * 1000, // 1 minuto
+  maxRequests: 10,
+});
+
 export async function POST(request: NextRequest) {
+  // ✅ APLICAR RATE LIMITING
+  const rateLimitResult = await webhookLimiter.check(request);
+  if (!rateLimitResult.success) {
+    console.warn(
+      `⚠️ Rate limit excedido para IP: ${request.headers.get("x-forwarded-for") || "unknown"}`
+    );
+    return NextResponse.json(
+      { error: "Too many requests" },
+      { status: 429 }
+    );
+  }
+
   // 🔒 SEGURANÇA: Verificar assinatura HMAC-SHA256 do Mercado Pago
   const signature = request.headers.get("x-signature");
   const xRequestId = request.headers.get("x-request-id");

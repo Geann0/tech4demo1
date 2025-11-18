@@ -15,6 +15,8 @@
  * 4. Enviar PDF DANFE por email ao cliente
  */
 
+import { calculateTaxes, validateCPF, validateCNPJ } from "./tax-calculator";
+
 interface NFEProduct {
   codigo: string;
   descricao: string;
@@ -72,6 +74,29 @@ export async function emitNFeIO(data: NFERequest): Promise<NFEResponse> {
     };
   }
 
+  // ✅ VALIDAÇÃO DE CPF/CNPJ
+  const documentoCliente = data.cliente.cpf || data.cliente.cnpj;
+  if (!documentoCliente) {
+    return {
+      success: false,
+      error: "Cliente sem CPF ou CNPJ informado",
+    };
+  }
+
+  const isValidDocument =
+    (data.cliente.cpf && validateCPF(data.cliente.cpf)) ||
+    (data.cliente.cnpj && validateCNPJ(data.cliente.cnpj));
+
+  if (!isValidDocument) {
+    return {
+      success: false,
+      error: "CPF ou CNPJ inválido",
+    };
+  }
+
+  // ✅ CÁLCULO DE IMPOSTOS
+  const taxes = calculateTaxes(data.valorTotal, data.cliente.endereco.estado);
+
   try {
     const response = await fetch(
       `https://api.nfe.io/v1/companies/${companyId}/serviceinvoices`,
@@ -85,8 +110,7 @@ export async function emitNFeIO(data: NFERequest): Promise<NFEResponse> {
           borrower: {
             name: data.cliente.nome,
             email: data.cliente.email,
-            federalTaxNumber:
-              data.cliente.cpf || data.cliente.cnpj || "00000000000",
+            federalTaxNumber: documentoCliente.replace(/\D/g, ""),
             address: {
               street: data.cliente.endereco.logradouro,
               number: data.cliente.endereco.numero,
@@ -104,6 +128,22 @@ export async function emitNFeIO(data: NFERequest): Promise<NFEResponse> {
             quantity: p.quantidade,
             unitValue: p.valorUnitario,
           })),
+          // ✅ IMPOSTOS CALCULADOS
+          taxes: {
+            icms: {
+              rate: taxes.icms.aliquota,
+              value: taxes.icms.valor,
+            },
+            pis: {
+              rate: taxes.pis.aliquota,
+              value: taxes.pis.valor,
+            },
+            cofins: {
+              rate: taxes.cofins.aliquota,
+              value: taxes.cofins.valor,
+            },
+          },
+          totalValue: taxes.valorComImpostos,
         }),
       }
     );
@@ -118,6 +158,8 @@ export async function emitNFeIO(data: NFERequest): Promise<NFEResponse> {
     }
 
     const result = await response.json();
+
+    console.log("✅ NF-e emitida com sucesso:", result.number);
 
     return {
       success: true,
