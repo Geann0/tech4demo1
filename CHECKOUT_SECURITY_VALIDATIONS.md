@@ -5,6 +5,7 @@
 ### ❌ PROBLEMA CRÍTICO ANTERIOR
 
 **Cenário de Risco:**
+
 - Cliente selecionava 1 item de R$ 100,00
 - Carrinho tinha 3 itens totalizando R$ 300,00
 - **Frontend enviava**: Todos os 3 itens (R$ 300,00)
@@ -20,18 +21,20 @@
 ### 1. **Frontend - CheckoutCartForm.tsx**
 
 #### 1.1 Envio de Dados Corretos
+
 ```typescript
 // ❌ ANTES (ERRADO)
 <input type="hidden" name="cartData" value={JSON.stringify(cart)} />
 
 // ✅ DEPOIS (CORRETO)
-<input type="hidden" name="cartData" value={JSON.stringify({ 
-  items: selectedItems, 
-  total: selectedTotal 
+<input type="hidden" name="cartData" value={JSON.stringify({
+  items: selectedItems,
+  total: selectedTotal
 })} />
 ```
 
 #### 1.2 Cálculo de Frete
+
 ```typescript
 // ❌ ANTES
 setShipping(calculateShipping(cleanCEP, cart.total));
@@ -41,6 +44,7 @@ setShipping(calculateShipping(cleanCEP, selectedTotal));
 ```
 
 #### 1.3 Exibição de Subtotal
+
 ```typescript
 // ❌ ANTES
 <span>R$ {cart.total.toFixed(2)}</span>
@@ -50,6 +54,7 @@ setShipping(calculateShipping(cleanCEP, selectedTotal));
 ```
 
 #### 1.4 Total Final
+
 ```typescript
 // ❌ ANTES
 R$ {(cart.total + shipping.value).toFixed(2)}
@@ -59,6 +64,7 @@ R$ {(selectedTotal + shipping.value).toFixed(2)}
 ```
 
 #### 1.5 Validação de Itens Selecionados
+
 ```typescript
 // ❌ ANTES
 if (cart.items.length === 0) return null;
@@ -72,6 +78,7 @@ if (!hasSelectedItems) return null;
 ### 2. **Backend - cartActions.ts**
 
 #### 2.1 Validação de Total (Anti-Fraude)
+
 ```typescript
 // Calcula o total baseado nos itens recebidos
 const calculatedTotal = cart.items.reduce(
@@ -91,6 +98,7 @@ if (Math.abs(calculatedTotal - cart.total) > 0.01) {
 ---
 
 #### 2.2 Validação de Preços (Anti-Fraude)
+
 ```typescript
 // Busca preço atual do produto no banco
 const { data: product } = await supabase
@@ -113,6 +121,7 @@ if (Math.abs(product.price - item.product_price) > 0.01) {
 ---
 
 #### 2.3 Validação de Estoque
+
 ```typescript
 if (
   product.stock !== null &&
@@ -132,6 +141,7 @@ if (
 ---
 
 #### 2.4 Validação de Itens do Mercado Pago
+
 ```typescript
 // Calcula total dos itens que serão enviados ao MP
 const mpTotal = mpItems.reduce(
@@ -155,11 +165,13 @@ if (Math.abs(mpTotal - cart.total) > 0.01) {
 ## 🔍 Logs de Auditoria Implementados
 
 ### Logs de Validação
+
 ```
 ✅ Validação de total OK: { itemCount: 2, total: 299.98, calculated: 299.98 }
 ```
 
 ### Logs de Estoque
+
 ```
 🔍 Verificando estoque de 2 produto(s)...
 ✅ Fone Bluetooth: Estoque OK (1/5)
@@ -167,6 +179,7 @@ if (Math.abs(mpTotal - cart.total) > 0.01) {
 ```
 
 ### Logs de Criação de Pedido
+
 ```
 📦 Criando pedido...
 Total do pedido: 299.98
@@ -175,6 +188,7 @@ Quantidade de itens: 2
 ```
 
 ### Logs de Itens
+
 ```
 📝 Criando 2 item(s) do pedido...
 Item 1: { product_id: 'xxx', quantity: 1, price: 149.99, subtotal: 149.99 }
@@ -183,6 +197,7 @@ Item 2: { product_id: 'yyy', quantity: 1, price: 149.99, subtotal: 149.99 }
 ```
 
 ### Logs de Mercado Pago
+
 ```
 💳 Preparando itens para Mercado Pago...
 ✅ Itens Mercado Pago: {
@@ -200,37 +215,45 @@ Item 2: { product_id: 'yyy', quantity: 1, price: 149.99, subtotal: 149.99 }
 ## 🛡️ Camadas de Proteção
 
 ### Camada 1: Seleção (Frontend)
+
 - Apenas itens com `selected: true` vão para o checkout
 - Validação de `hasSelectedItems` antes de prosseguir
 
 ### Camada 2: Cálculos (Frontend)
+
 - `selectedTotal` calculado corretamente
 - Frete baseado em `selectedTotal`
 - Exibição visual coerente com valores reais
 
 ### Camada 3: Envio (Frontend → Backend)
+
 - Apenas `selectedItems` são serializados
 - Total enviado é `selectedTotal`
 
 ### Camada 4: Validação de Total (Backend)
+
 - Recalcula total baseado nos itens recebidos
 - Compara com total informado
 - Rejeita se divergência > R$ 0,01
 
 ### Camada 5: Validação de Preços (Backend)
+
 - Compara preços recebidos com preços do banco
 - Rejeita se preço foi alterado
 
 ### Camada 6: Validação de Estoque (Backend)
+
 - Verifica disponibilidade de cada produto
 - Rejeita se estoque insuficiente
 
 ### Camada 7: Validação Mercado Pago (Backend)
+
 - Recalcula total dos itens do MP
 - Confirma que MP cobrará valor correto
 - Rejeita se divergência
 
 ### Camada 8: Auditoria (Backend)
+
 - Logs detalhados de todas as operações
 - Rastreabilidade completa do processo
 - Alertas em caso de inconsistências
@@ -274,21 +297,25 @@ Item 2: { product_id: 'yyy', quantity: 1, price: 149.99, subtotal: 149.99 }
 ## ⚠️ Cenários de Falha Detectados
 
 ### Cenário 1: Manipulação de Total
+
 **Tentativa:** Frontend envia total menor que a soma dos itens
 **Detecção:** Camada 4 - Validação de Total
 **Resultado:** Pedido rejeitado com erro "Erro de validação"
 
 ### Cenário 2: Manipulação de Preços
+
 **Tentativa:** Frontend altera preço de produto antes de enviar
 **Detecção:** Camada 5 - Validação de Preços
 **Resultado:** Pedido rejeitado com erro "Preço foi alterado"
 
 ### Cenário 3: Estoque Insuficiente
+
 **Tentativa:** Comprar mais unidades do que há em estoque
 **Detecção:** Camada 6 - Validação de Estoque
 **Resultado:** Pedido rejeitado com erro de estoque
 
 ### Cenário 4: Divergência no Mercado Pago
+
 **Tentativa:** Inconsistência entre itens do pedido e itens do MP
 **Detecção:** Camada 7 - Validação Mercado Pago
 **Resultado:** Pedido rejeitado com erro crítico

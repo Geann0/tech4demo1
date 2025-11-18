@@ -82,7 +82,7 @@ export async function processCartCheckout(
 
     // Verificar estoque de todos os produtos
     console.log(`🔍 Verificando estoque de ${cart.items.length} produto(s)...`);
-    
+
     for (const item of cart.items) {
       const { data: product, error: productError } = await supabase
         .from("products")
@@ -111,20 +111,24 @@ export async function processCartCheckout(
         product.stock < item.quantity
       ) {
         console.error(`❌ Estoque insuficiente: ${product.name}`);
-        console.error(`Solicitado: ${item.quantity}, Disponível: ${product.stock}`);
+        console.error(
+          `Solicitado: ${item.quantity}, Disponível: ${product.stock}`
+        );
         return {
           error: `Desculpe, "${product.name}" tem apenas ${product.stock} unidade(s) disponível(is).`,
         };
       }
-      
-      console.log(`✅ ${product.name}: Estoque OK (${item.quantity}/${product.stock || '∞'})`);
+
+      console.log(
+        `✅ ${product.name}: Estoque OK (${item.quantity}/${product.stock || "∞"})`
+      );
     }
 
     // Criar pedido principal
     console.log("📦 Criando pedido...");
     console.log("Total do pedido:", cart.total);
     console.log("Quantidade de itens:", cart.items.length);
-    
+
     const { data: orderData, error: orderError } = await supabase
       .from("orders")
       .insert({
@@ -159,7 +163,7 @@ export async function processCartCheckout(
 
     // Criar itens do pedido
     console.log(`📝 Criando ${cart.items.length} item(s) do pedido...`);
-    
+
     const orderItems = cart.items.map((item) => ({
       order_id: orderData.id,
       product_id: item.product_id,
@@ -237,7 +241,7 @@ export async function processCartCheckout(
 
     // Preparar itens para o Mercado Pago
     console.log("💳 Preparando itens para Mercado Pago...");
-    
+
     const mpItems = cart.items.map((item) => ({
       id: item.product_id,
       title: item.product_name,
@@ -265,7 +269,10 @@ export async function processCartCheckout(
     console.log("✅ Itens Mercado Pago:", {
       count: mpItems.length,
       total: mpTotal,
-      items: mpItems.map((i) => `${i.quantity}x ${i.title} = R$${(i.unit_price * i.quantity).toFixed(2)}`),
+      items: mpItems.map(
+        (i) =>
+          `${i.quantity}x ${i.title} = R$${(i.unit_price * i.quantity).toFixed(2)}`
+      ),
     });
 
     const preferenceBody: any = {

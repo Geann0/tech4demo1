@@ -67,7 +67,14 @@ export default async function AdminOrdersPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-700">
-              {((orders as Order[]) || []).map((order) => (
+              {((orders as Order[]) || []).map((order) => {
+                // 🔒 CALCULAR TOTAL REAL baseado nos order_items
+                const orderTotal = (order.order_items || []).reduce(
+                  (sum, item) => sum + (item.price_at_purchase * item.quantity),
+                  0
+                );
+                
+                return (
                 <tr key={order.id}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
                     {order.customer_name}
@@ -84,7 +91,13 @@ export default async function AdminOrdersPage() {
                     {new Intl.NumberFormat("pt-BR", {
                       style: "currency",
                       currency: "BRL",
-                    }).format(order.total_amount)}
+                    }).format(orderTotal)}
+                    {/* Verificar inconsistência */}
+                    {Math.abs(orderTotal - order.total_amount) > 0.01 && (
+                      <div className="text-xs text-red-400 mt-1">
+                        ⚠️ Divergência: BD = R$ {order.total_amount.toFixed(2)}
+                      </div>
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     <span
@@ -109,7 +122,8 @@ export default async function AdminOrdersPage() {
                     />
                   </td>
                 </tr>
-              ))}
+              );
+              })}
             </tbody>
           </table>
         </div>

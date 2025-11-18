@@ -58,24 +58,63 @@ export default async function PartnerOrdersPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-700">
-            {((orders as Order[]) || []).map((order) => (
+            {((orders as Order[]) || []).map((order) => {
+              // 🔒 CALCULAR SUBTOTAL apenas dos produtos deste parceiro
+              const partnerItems = (order.order_items || []).filter(
+                (item) => item.products?.partner_id === user.id
+              );
+              
+              const partnerSubtotal = partnerItems.reduce(
+                (sum, item) => sum + (item.price_at_purchase * item.quantity),
+                0
+              );
+              
+              const totalOrderValue = (order.order_items || []).reduce(
+                (sum, item) => sum + (item.price_at_purchase * item.quantity),
+                0
+              );
+              
+              return (
               <tr key={order.id}>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
                   {order.customer_name}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                  {(order.order_items || []).map((item) => (
-                    <div key={item.id}>
+                  {partnerItems.map((item) => (
+                    <div key={item.id} className="mb-1">
                       {item.products?.name ?? "Produto não encontrado"} (x
                       {item.quantity})
+                      <span className="text-xs text-gray-500 ml-2">
+                        R$ {(item.price_at_purchase * item.quantity).toFixed(2)}
+                      </span>
                     </div>
                   ))}
+                  {/* Indicar se há outros produtos no pedido */}
+                  {(order.order_items?.length || 0) > partnerItems.length && (
+                    <div className="text-xs text-gray-500 mt-1">
+                      + {(order.order_items?.length || 0) - partnerItems.length} produto(s) de outro(s) parceiro(s)
+                    </div>
+                  )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                  {new Intl.NumberFormat("pt-BR", {
-                    style: "currency",
-                    currency: "BRL",
-                  }).format(order.total_amount)}
+                  <div className="font-bold text-neon-blue">
+                    {new Intl.NumberFormat("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    }).format(partnerSubtotal)}
+                  </div>
+                  {/* Mostrar total do pedido se houver outros produtos */}
+                  {Math.abs(partnerSubtotal - totalOrderValue) > 0.01 && (
+                    <div className="text-xs text-gray-500 mt-1">
+                      Pedido total: R$ {totalOrderValue.toFixed(2)}
+                    </div>
+                  )}
+                  {/* Verificar inconsistência com BD */}
+                  {Math.abs(totalOrderValue - order.total_amount) > 0.01 && (
+                    <div className="text-xs text-red-400 mt-1">
+                      ⚠️ BD: R$ {order.total_amount.toFixed(2)}
+                    </div>
+                  )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm">
                   <span
@@ -100,7 +139,8 @@ export default async function PartnerOrdersPage() {
                   />
                 </td>
               </tr>
-            ))}
+            );
+            })}
           </tbody>
         </table>
       </div>

@@ -168,7 +168,14 @@ export default function CheckoutCartForm({
 
           <div className="p-6 space-y-4">
             {/* Input fields com emojis */}
-            <input type="hidden" name="cartData" value={JSON.stringify({ items: selectedItems, total: selectedTotal })} />
+            <input
+              type="hidden"
+              name="cartData"
+              value={JSON.stringify({
+                items: selectedItems,
+                total: selectedTotal,
+              })}
+            />
 
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -421,7 +428,9 @@ export default function CheckoutCartForm({
             <div className="border-t border-gray-700 pt-4 space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-400">Subtotal:</span>
-                <span className="text-white">R$ {selectedTotal.toFixed(2)}</span>
+                <span className="text-white">
+                  R$ {selectedTotal.toFixed(2)}
+                </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-400">🚚 Frete:</span>
