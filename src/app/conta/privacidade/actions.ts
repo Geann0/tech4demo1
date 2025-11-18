@@ -1,14 +1,12 @@
 "use server";
 
 import { createClient } from "@/lib/supabaseServer";
-import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 /**
- * 📥 EXPORTAR DADOS PESSOAIS (LGPD Art. 18)
- * 
- * Direito do titular: obter cópia de todos os dados pessoais
+ * Exportar todos os dados pessoais do usuário (direito LGPD)
  */
-export async function exportPersonalData() {
+export async function exportUserData() {
   const supabase = await createClient();
 
   const {
@@ -16,80 +14,107 @@ export async function exportPersonalData() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { error: "Não autenticado" };
+    return { success: false, error: "Não autenticado" };
   }
 
   try {
-    // 1. Dados do perfil
+    // Buscar dados do perfil
     const { data: profile } = await supabase
       .from("profiles")
       .select("*")
       .eq("id", user.id)
       .single();
 
-    // 2. Endereços
-    const { data: addresses } = await supabase
-      .from("addresses")
-      .select("*")
-      .eq("user_id", user.id);
-
-    // 3. Pedidos
+    // Buscar pedidos
     const { data: orders } = await supabase
       .from("orders")
-      .select("*, order_items(*)")
-      .eq("customer_id", user.id);
+      .select("*, order_items(*, products(name, price))")
+      .eq("customer_email", user.email);
 
-    // 4. Favoritos
+    // Buscar favoritos
     const { data: favorites } = await supabase
       .from("favorites")
-      .select("*, product:products(*)")
+      .select("*, products(name, price, image_url)")
       .eq("user_id", user.id);
 
-    // 5. Avaliações
+    // Buscar avaliações
     const { data: reviews } = await supabase
       .from("reviews")
-      .select("*")
+      .select("*, products(name)")
       .eq("user_id", user.id);
 
     // Compilar todos os dados
-    const personalData = {
+    const userData = {
       exportDate: new Date().toISOString(),
       user: {
         id: user.id,
         email: user.email,
         createdAt: user.created_at,
       },
-      profile,
-      addresses: addresses || [],
-      orders: orders || [],
-      favorites: favorites || [],
-      reviews: reviews || [],
-      lgpdConsent: {
-        consented: profile?.lgpd_consent || false,
-        consentDate: profile?.lgpd_consent_date || null,
-      },
+      profile: profile
+        ? {
+            fullName: profile.full_name,
+            phone: profile.phone,
+            cpf: profile.cpf,
+            birthDate: profile.birth_date,
+            lgpdConsent: profile.lgpd_consent,
+            lgpdConsentDate: profile.lgpd_consent_date,
+          }
+        : null,
+      addresses: profile?.addresses || [],
+      orders: orders?.map((o) => ({
+        id: o.id,
+        date: o.created_at,
+        status: o.status,
+        totalAmount: o.total_amount,
+        items: o.order_items,
+        shippingAddress: {
+          address: o.customer_address,
+          number: o.customer_number,
+          complement: o.customer_complement,
+          neighborhood: o.customer_neighborhood,
+          city: o.customer_city,
+          state: o.customer_state,
+          cep: o.customer_cep,
+        },
+      })),
+      favorites: favorites?.map((f) => ({
+        productName: f.products.name,
+        addedAt: f.created_at,
+      })),
+      reviews: reviews?.map((r) => ({
+        productName: r.products.name,
+        rating: r.rating,
+        comment: r.comment,
+        createdAt: r.created_at,
+      })),
     };
 
-    // Retornar como JSON para download
+    // Converter para JSON formatado
+    const jsonData = JSON.stringify(userData, null, 2);
+
+    // Retornar como base64 para download
+    const base64Data = Buffer.from(jsonData).toString("base64");
+
     return {
       success: true,
-      data: JSON.stringify(personalData, null, 2),
-      filename: `tech4loop-dados-${user.id}-${Date.now()}.json`,
+      data: base64Data,
+      filename: `meus-dados-tech4loop-${new Date().toISOString().split("T")[0]}.json`,
     };
   } catch (error) {
     console.error("❌ Erro ao exportar dados:", error);
-    return { error: "Erro ao exportar dados" };
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Erro ao exportar dados",
+    };
   }
 }
 
 /**
- * 🗑️ EXCLUIR CONTA (LGPD Art. 18)
- * 
- * Direito do titular: solicitar eliminação dos dados pessoais
- * 
- * IMPORTANTE: Esta ação é irreversível!
+ * Solicitar exclusão de conta (direito LGPD - direito ao esquecimento)
  */
-export async function deleteAccount(password: string) {
+export async function requestAccountDeletion() {
   const supabase = await createClient();
 
   const {
@@ -97,66 +122,102 @@ export async function deleteAccount(password: string) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { error: "Não autenticado" };
+    return { success: false, error: "Não autenticado" };
   }
 
   try {
-    // Verificar senha antes de deletar
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email: user.email!,
-      password,
-    });
+    // Registrar solicitação de exclusão
+    const { error: logError } = await supabase
+      .from("deletion_requests")
+      .insert({
+        user_id: user.id,
+        email: user.email,
+        requested_at: new Date().toISOString(),
+        status: "pending",
+        reason: "User requested via LGPD privacy page",
+      });
 
-    if (signInError) {
-      return { error: "Senha incorreta" };
-    }
+    if (logError) throw logError;
 
-    // 1. Anonimizar pedidos (manter histórico para contabilidade)
-    await supabase
-      .from("orders")
-      .update({
-        customer_email: "usuario-excluido@tech4loop.com",
-        customer_phone: null,
-      })
-      .eq("customer_id", user.id);
+    // Anonimizar dados imediatamente (não excluir por questões legais/fiscais)
+    const { error: updateError } = await supabase.from("profiles").update({
+      full_name: "[DADOS REMOVIDOS]",
+      phone: null,
+      cpf: null,
+      birth_date: null,
+      addresses: [],
+      lgpd_consent: false,
+    }).eq("id", user.id);
 
-    // 2. Deletar endereços
-    await supabase.from("addresses").delete().eq("user_id", user.id);
+    if (updateError) throw updateError;
 
-    // 3. Deletar favoritos
-    await supabase.from("favorites").delete().eq("user_id", user.id);
-
-    // 4. Anonimizar avaliações (manter para estatísticas)
-    await supabase
-      .from("reviews")
-      .update({ user_name: "Usuário Anônimo" })
-      .eq("user_id", user.id);
-
-    // 5. Deletar perfil
-    await supabase.from("profiles").delete().eq("id", user.id);
-
-    // 6. Deletar conta de autenticação
-    const { error: deleteError } = await supabase.auth.admin.deleteUser(
-      user.id
-    );
-
-    if (deleteError) {
-      console.error("❌ Erro ao deletar usuário:", deleteError);
-      return { error: "Erro ao deletar conta" };
-    }
-
-    // Logout
+    // Logout do usuário
     await supabase.auth.signOut();
 
-    return { success: true };
+    return {
+      success: true,
+      message:
+        "Sua solicitação de exclusão foi registrada. Seus dados foram anonimizados e você receberá um e-mail de confirmação em até 48 horas.",
+    };
   } catch (error) {
-    console.error("❌ Erro ao deletar conta:", error);
-    return { error: "Erro ao processar exclusão" };
+    console.error("❌ Erro ao solicitar exclusão:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Erro ao processar solicitação",
+    };
   }
 }
 
 /**
- * 📜 HISTÓRICO DE CONSENTIMENTOS
+ * Atualizar preferências de consentimento LGPD
+ */
+export async function updateConsent(consent: {
+  marketing: boolean;
+  analytics: boolean;
+  personalization: boolean;
+}) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { success: false, error: "Não autenticado" };
+  }
+
+  try {
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        consent_marketing: consent.marketing,
+        consent_analytics: consent.analytics,
+        consent_personalization: consent.personalization,
+        lgpd_consent_updated_at: new Date().toISOString(),
+      })
+      .eq("id", user.id);
+
+    if (error) throw error;
+
+    revalidatePath("/conta/privacidade");
+
+    return {
+      success: true,
+      message: "Preferências atualizadas com sucesso",
+    };
+  } catch (error) {
+    console.error("❌ Erro ao atualizar consentimento:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Erro ao atualizar preferências",
+    };
+  }
+}
+
+/**
+ * Obter histórico de consentimentos
  */
 export async function getConsentHistory() {
   const supabase = await createClient();
@@ -166,49 +227,51 @@ export async function getConsentHistory() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login");
+    return { success: false, error: "Não autenticado", history: [] };
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("lgpd_consent, lgpd_consent_date, created_at")
-    .eq("id", user.id)
-    .single();
+  try {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select(
+        "lgpd_consent, lgpd_consent_date, lgpd_consent_updated_at, consent_marketing, consent_analytics, consent_personalization"
+      )
+      .eq("id", user.id)
+      .single();
 
-  return {
-    consents: [
+    if (!profile) {
+      return { success: false, error: "Perfil não encontrado", history: [] };
+    }
+
+    const history = [
       {
-        type: "Termos de Uso e Política de Privacidade",
-        granted: profile?.lgpd_consent || false,
-        date: profile?.lgpd_consent_date || profile?.created_at,
+        date: profile.lgpd_consent_date,
+        action: "Consentimento inicial",
+        details: "Aceite dos termos de uso e política de privacidade",
       },
-    ],
-  };
-}
+    ];
 
-/**
- * 🔄 REVOGAR CONSENTIMENTO
- */
-export async function revokeConsent() {
-  const supabase = await createClient();
+    if (profile.lgpd_consent_updated_at) {
+      history.push({
+        date: profile.lgpd_consent_updated_at,
+        action: "Atualização de preferências",
+        details: `Marketing: ${profile.consent_marketing ? "Sim" : "Não"}, Analytics: ${profile.consent_analytics ? "Sim" : "Não"}, Personalização: ${profile.consent_personalization ? "Sim" : "Não"}`,
+      });
+    }
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { error: "Não autenticado" };
+    return {
+      success: true,
+      history: history.sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+      ),
+    };
+  } catch (error) {
+    console.error("❌ Erro ao buscar histórico:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Erro ao buscar histórico",
+      history: [],
+    };
   }
-
-  // Revogar consentimento = deletar conta (não pode usar sistema sem aceitar termos)
-  await supabase
-    .from("profiles")
-    .update({ lgpd_consent: false })
-    .eq("id", user.id);
-
-  return {
-    success: true,
-    message:
-      "Consentimento revogado. Sua conta será desativada em 30 dias conforme LGPD.",
-  };
 }

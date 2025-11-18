@@ -34,35 +34,17 @@ const nextConfig = {
           key: "Permissions-Policy",
           value: "camera=(), microphone=(), geolocation=()",
         },
-        // ✅ SEGURANÇA ADICIONAL
         {
           key: "Strict-Transport-Security",
-          value: "max-age=63072000; includeSubDomains; preload",
+          value: "max-age=31536000; includeSubDomains; preload",
         },
         {
           key: "Content-Security-Policy",
-          value: [
-            "default-src 'self'",
-            "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://sdk.mercadopago.com",
-            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-            "img-src 'self' data: https: blob:",
-            "font-src 'self' data: https://fonts.gstatic.com",
-            "connect-src 'self' https://ovnmvbyjvpbsfacywgig.supabase.co https://api.mercadopago.com https://www.google-analytics.com",
-            "frame-src 'self' https://www.mercadopago.com",
-            "object-src 'none'",
-            "base-uri 'self'",
-            "form-action 'self'",
-            "frame-ancestors 'none'",
-            "upgrade-insecure-requests",
-          ].join("; "),
+          value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://sdk.mercadopago.com https://www.googletagmanager.com https://connect.facebook.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://api.mercadopago.com https://nfe.io https://api.bling.com.br https://api.tiny.com.br https://melhorenvio.com.br; frame-src https://sdk.mercadopago.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests;",
         },
         {
           key: "X-XSS-Protection",
           value: "1; mode=block",
-        },
-        {
-          key: "X-DNS-Prefetch-Control",
-          value: "on",
         },
       ],
     },

@@ -5,7 +5,7 @@ import { Resend } from "resend";
 import NewOrderEmail from "@/components/emails/NewOrderEmail";
 import crypto from "crypto";
 import { emitNFe } from "@/lib/nfe-integration";
-import { rateLimit } from "@/lib/rateLimit";
+import { checkRateLimit, getWebhookIdentifier } from "@/lib/webhookRateLimit";
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -14,22 +14,31 @@ const supabaseAdmin = createClient(
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// ✅ RATE LIMITING: Máximo 10 requisições por minuto por IP
-const webhookLimiter = rateLimit({
-  interval: 60 * 1000, // 1 minuto
-  maxRequests: 10,
-});
-
 export async function POST(request: NextRequest) {
-  // ✅ APLICAR RATE LIMITING
-  const rateLimitResult = await webhookLimiter.check(request);
-  if (!rateLimitResult.success) {
-    console.warn(
-      `⚠️ Rate limit excedido para IP: ${request.headers.get("x-forwarded-for") || "unknown"}`
-    );
+  // 🔒 RATE LIMITING: Proteger contra flood de webhooks
+  const ip = request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip");
+  const identifier = getWebhookIdentifier(ip, undefined); // Será atualizado com payment_id depois
+  
+  const rateLimit = checkRateLimit(identifier, {
+    maxRequests: 50, // 50 requests por minuto por IP
+    windowMs: 60 * 1000,
+  });
+
+  if (!rateLimit.allowed) {
+    console.warn(`⚠️ Rate limit excedido para ${identifier}`);
     return NextResponse.json(
-      { error: "Too many requests" },
-      { status: 429 }
+      { 
+        error: "Too many requests",
+        resetTime: new Date(rateLimit.resetTime).toISOString() 
+      },
+      { 
+        status: 429,
+        headers: {
+          "X-RateLimit-Limit": "50",
+          "X-RateLimit-Remaining": "0",
+          "X-RateLimit-Reset": rateLimit.resetTime.toString(),
+        }
+      }
     );
   }
 

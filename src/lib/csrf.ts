@@ -1,117 +1,93 @@
-/**
- * 🔒 PROTEÇÃO CSRF (Cross-Site Request Forgery)
- * 
- * Previne ataques onde um site malicioso força o navegador do usuário
- * a fazer requisições não autorizadas para nosso site.
- * 
- * COMO FUNCIONA:
- * 1. Servidor gera token aleatório e salva no cookie
- * 2. Cliente envia token no header da requisição
- * 3. Servidor compara token do cookie com token do header
- * 4. Se não bater, rejeita requisição
- */
-
 import { cookies } from "next/headers";
 import crypto from "crypto";
 
-const CSRF_COOKIE_NAME = "csrf_token";
+const CSRF_TOKEN_NAME = "csrf_token";
 const CSRF_HEADER_NAME = "x-csrf-token";
-const TOKEN_LENGTH = 32;
 
 /**
- * Gera token CSRF seguro
+ * Gera um token CSRF único e seguro
  */
 export function generateCSRFToken(): string {
-  return crypto.randomBytes(TOKEN_LENGTH).toString("hex");
+  return crypto.randomBytes(32).toString("hex");
 }
 
 /**
- * Salva token CSRF no cookie
+ * Define o token CSRF no cookie
  */
 export async function setCSRFToken(): Promise<string> {
   const token = generateCSRFToken();
   const cookieStore = await cookies();
-
-  cookieStore.set(CSRF_COOKIE_NAME, token, {
+  
+  cookieStore.set(CSRF_TOKEN_NAME, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
     maxAge: 60 * 60 * 24, // 24 horas
     path: "/",
   });
-
+  
   return token;
 }
 
 /**
- * Valida token CSRF
+ * Obtém o token CSRF do cookie
  */
-export async function validateCSRFToken(
-  requestToken: string | null
-): Promise<boolean> {
-  if (!requestToken) {
-    console.error("❌ CSRF: Token não fornecido");
-    return false;
-  }
-
+export async function getCSRFToken(): Promise<string | undefined> {
   const cookieStore = await cookies();
-  const cookieToken = cookieStore.get(CSRF_COOKIE_NAME)?.value;
-
-  if (!cookieToken) {
-    console.error("❌ CSRF: Token não encontrado no cookie");
-    return false;
-  }
-
-  // Comparação segura (evita timing attacks)
-  const isValid = crypto.timingSafeEqual(
-    Buffer.from(requestToken),
-    Buffer.from(cookieToken)
-  );
-
-  if (!isValid) {
-    console.error("❌ CSRF: Token inválido");
-  }
-
-  return isValid;
+  return cookieStore.get(CSRF_TOKEN_NAME)?.value;
 }
 
 /**
- * Middleware para validar CSRF em Server Actions
+ * Valida o token CSRF enviado no request
  */
-export async function validateCSRF(
-  headers: Headers
-): Promise<{ valid: boolean; error?: string }> {
-  const token = headers.get(CSRF_HEADER_NAME);
-
-  if (!token) {
-    return {
-      valid: false,
-      error: "CSRF token não fornecido",
-    };
+export async function validateCSRFToken(
+  requestToken: string | null | undefined
+): Promise<boolean> {
+  if (!requestToken) {
+    return false;
   }
 
+  const cookieToken = await getCSRFToken();
+  
+  if (!cookieToken) {
+    return false;
+  }
+
+  // Comparação segura contra timing attacks
+  return crypto.timingSafeEqual(
+    Buffer.from(cookieToken),
+    Buffer.from(requestToken)
+  );
+}
+
+/**
+ * Middleware para validar CSRF em requisições POST/PUT/DELETE
+ */
+export async function requireCSRF(request: Request): Promise<void> {
+  const method = request.method;
+  
+  // Apenas valida em métodos de modificação
+  if (!["POST", "PUT", "DELETE", "PATCH"].includes(method)) {
+    return;
+  }
+
+  const token = request.headers.get(CSRF_HEADER_NAME);
   const isValid = await validateCSRFToken(token);
 
   if (!isValid) {
-    return {
-      valid: false,
-      error: "CSRF token inválido",
-    };
+    throw new Error("CSRF token inválido ou ausente");
   }
-
-  return { valid: true };
 }
 
 /**
- * Hook para componentes client (retorna token para enviar no form)
+ * Hook para obter o token CSRF para usar em formulários
  */
-export async function getCSRFToken(): Promise<string> {
-  const cookieStore = await cookies();
-  let token = cookieStore.get(CSRF_COOKIE_NAME)?.value;
-
+export async function getCSRFTokenForForm(): Promise<string> {
+  let token = await getCSRFToken();
+  
   if (!token) {
     token = await setCSRFToken();
   }
-
+  
   return token;
 }
