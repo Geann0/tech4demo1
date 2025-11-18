@@ -48,7 +48,8 @@ export default function CheckoutCartForm({
 }: {
   userEmail?: string;
 }) {
-  const { cart, clearCart, selectedItems, selectedTotal, hasSelectedItems } = useCart();
+  const { cart, clearCart, selectedItems, selectedTotal, hasSelectedItems } =
+    useCart();
   const router = useRouter();
   const initialState = { error: null, success: false, paymentUrl: undefined };
   const [state, formAction] = useFormState(processCartCheckout, initialState);
@@ -64,7 +65,9 @@ export default function CheckoutCartForm({
     city: "",
     state: "",
   });
-  const [shipping, setShipping] = useState(calculateShipping("", selectedTotal));
+  const [shipping, setShipping] = useState(
+    calculateShipping("", selectedTotal)
+  );
 
   // Redirecionar se não há itens selecionados
   useEffect(() => {
@@ -121,7 +124,7 @@ export default function CheckoutCartForm({
           city: addressData.localidade,
           state: addressData.uf,
         });
-        setShipping(calculateShipping(cleanCEP, cart.total));
+        setShipping(calculateShipping(cleanCEP, selectedTotal));
       }
     }
   };
@@ -131,7 +134,7 @@ export default function CheckoutCartForm({
     setFormData({ ...formData, phone: formatted });
   };
 
-  if (cart.items.length === 0) {
+  if (!hasSelectedItems) {
     return null;
   }
 
@@ -165,7 +168,7 @@ export default function CheckoutCartForm({
 
           <div className="p-6 space-y-4">
             {/* Input fields com emojis */}
-            <input type="hidden" name="cartData" value={JSON.stringify(cart)} />
+            <input type="hidden" name="cartData" value={JSON.stringify({ items: selectedItems, total: selectedTotal })} />
 
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -418,7 +421,7 @@ export default function CheckoutCartForm({
             <div className="border-t border-gray-700 pt-4 space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-400">Subtotal:</span>
-                <span className="text-white">R$ {cart.total.toFixed(2)}</span>
+                <span className="text-white">R$ {selectedTotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-400">🚚 Frete:</span>
@@ -434,7 +437,7 @@ export default function CheckoutCartForm({
               <div className="flex justify-between text-xl font-bold">
                 <span className="text-white">Total:</span>
                 <span className="text-neon-blue">
-                  R$ {(cart.total + shipping.value).toFixed(2)}
+                  R$ {(selectedTotal + shipping.value).toFixed(2)}
                 </span>
               </div>
             </div>

@@ -52,21 +52,57 @@ export async function processCartCheckout(
       return { error: "Carrinho vazio" };
     }
 
+    // 🔒 VALIDAÇÃO CRÍTICA: Verificar se o total recebido bate com os itens
+    const calculatedTotal = cart.items.reduce(
+      (sum, item) => sum + item.product_price * item.quantity,
+      0
+    );
+
+    // Tolerância de 1 centavo para arredondamento
+    if (Math.abs(calculatedTotal - cart.total) > 0.01) {
+      console.error("❌ ALERTA DE SEGURANÇA: Total não bate!");
+      console.error("Total recebido:", cart.total);
+      console.error("Total calculado:", calculatedTotal);
+      console.error("Itens:", cart.items);
+      return {
+        error: "Erro de validação. Por favor, tente novamente.",
+      };
+    }
+
+    console.log("✅ Validação de total OK:", {
+      itemCount: cart.items.length,
+      total: cart.total,
+      calculated: calculatedTotal,
+    });
+
     // Validações básicas
     if (!name || !email || !phone || !address || !city || !cep || !userState) {
       return { error: "Por favor, preencha todos os campos obrigatórios." };
     }
 
     // Verificar estoque de todos os produtos
+    console.log(`🔍 Verificando estoque de ${cart.items.length} produto(s)...`);
+    
     for (const item of cart.items) {
       const { data: product, error: productError } = await supabase
         .from("products")
-        .select("stock, name")
+        .select("stock, name, price")
         .eq("id", item.product_id)
         .single();
 
       if (productError || !product) {
+        console.error(`❌ Produto ${item.product_id} não encontrado`);
         return { error: `Produto "${item.product_name}" não encontrado.` };
+      }
+
+      // 🔒 VALIDAÇÃO CRÍTICA: Verificar se o preço não foi alterado
+      if (Math.abs(product.price - item.product_price) > 0.01) {
+        console.error("❌ ALERTA: Preço foi alterado!");
+        console.error("Preço no banco:", product.price);
+        console.error("Preço recebido:", item.product_price);
+        return {
+          error: `O preço de "${product.name}" foi alterado. Por favor, atualize seu carrinho.`,
+        };
       }
 
       if (
@@ -74,13 +110,21 @@ export async function processCartCheckout(
         product.stock !== undefined &&
         product.stock < item.quantity
       ) {
+        console.error(`❌ Estoque insuficiente: ${product.name}`);
+        console.error(`Solicitado: ${item.quantity}, Disponível: ${product.stock}`);
         return {
           error: `Desculpe, "${product.name}" tem apenas ${product.stock} unidade(s) disponível(is).`,
         };
       }
+      
+      console.log(`✅ ${product.name}: Estoque OK (${item.quantity}/${product.stock || '∞'})`);
     }
 
     // Criar pedido principal
+    console.log("📦 Criando pedido...");
+    console.log("Total do pedido:", cart.total);
+    console.log("Quantidade de itens:", cart.items.length);
+    
     const { data: orderData, error: orderError } = await supabase
       .from("orders")
       .insert({
@@ -107,14 +151,31 @@ export async function processCartCheckout(
     }
 
     console.log("✅ Order created:", orderData.id);
+    console.log("Detalhes do pedido:", {
+      id: orderData.id,
+      total: orderData.total_amount,
+      customer: orderData.customer_name,
+    });
 
     // Criar itens do pedido
+    console.log(`📝 Criando ${cart.items.length} item(s) do pedido...`);
+    
     const orderItems = cart.items.map((item) => ({
       order_id: orderData.id,
       product_id: item.product_id,
       quantity: item.quantity,
       price_at_purchase: item.product_price,
     }));
+
+    // Log detalhado de cada item
+    orderItems.forEach((item, index) => {
+      console.log(`Item ${index + 1}:`, {
+        product_id: item.product_id,
+        quantity: item.quantity,
+        price: item.price_at_purchase,
+        subtotal: item.quantity * item.price_at_purchase,
+      });
+    });
 
     const { error: orderItemsError } = await supabase
       .from("order_items")
@@ -127,7 +188,7 @@ export async function processCartCheckout(
       };
     }
 
-    console.log(`✅ Created ${cart.items.length} order items`);
+    console.log(`✅ Created ${cart.items.length} order items successfully`);
 
     // Criar preferência Mercado Pago
     const client = new MercadoPagoConfig({
@@ -175,6 +236,8 @@ export async function processCartCheckout(
     }
 
     // Preparar itens para o Mercado Pago
+    console.log("💳 Preparando itens para Mercado Pago...");
+    
     const mpItems = cart.items.map((item) => ({
       id: item.product_id,
       title: item.product_name,
@@ -182,6 +245,28 @@ export async function processCartCheckout(
       unit_price: item.product_price,
       picture_url: item.product_image,
     }));
+
+    // 🔒 VALIDAÇÃO CRÍTICA: Verificar total do Mercado Pago
+    const mpTotal = mpItems.reduce(
+      (sum, item) => sum + item.unit_price * item.quantity,
+      0
+    );
+
+    if (Math.abs(mpTotal - cart.total) > 0.01) {
+      console.error("❌ ERRO CRÍTICO: Total do MP não bate!");
+      console.error("Total carrinho:", cart.total);
+      console.error("Total MP:", mpTotal);
+      console.error("Itens MP:", mpItems);
+      return {
+        error: "Erro ao processar pagamento. Contate o suporte.",
+      };
+    }
+
+    console.log("✅ Itens Mercado Pago:", {
+      count: mpItems.length,
+      total: mpTotal,
+      items: mpItems.map((i) => `${i.quantity}x ${i.title} = R$${(i.unit_price * i.quantity).toFixed(2)}`),
+    });
 
     const preferenceBody: any = {
       items: mpItems,
