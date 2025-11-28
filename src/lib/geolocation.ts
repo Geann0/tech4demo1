@@ -227,3 +227,59 @@ export function formatCoverageErrorMessage(
 ): string {
   return `Ops! A loja "${partnerName}" não atende sua região (${location.city}/${location.state}). ${reason}. Que tal buscar produtos similares de outras lojas que atendem sua área?`;
 }
+
+/**
+ * Normaliza o nome de uma cidade para padronização
+ */
+export function normalizeCity(city: string): string {
+  return city.trim().toUpperCase();
+}
+
+/**
+ * Verifica se uma cidade está na cobertura
+ */
+export function isCityInCoverage(
+  city: string,
+  coverage: CoverageArea
+): boolean {
+  if (coverage.type !== "city" || !coverage.cities) return false;
+  const normalizedCity = normalizeCity(city);
+  return coverage.cities.some((c) => normalizeCity(c) === normalizedCity);
+}
+
+/**
+ * Verifica se um estado está na cobertura
+ */
+export function isStateInCoverage(
+  state: string,
+  coverage: CoverageArea
+): boolean {
+  if (coverage.type !== "state" || !coverage.states) return false;
+  const normalizedState = state.toUpperCase();
+  return coverage.states.some((s) => s.toUpperCase() === normalizedState);
+}
+
+/**
+ * Verifica se um CEP está na cobertura
+ */
+export async function isCEPInCoverage(
+  cep: string,
+  coverage: CoverageArea
+): Promise<boolean> {
+  const cepData = await fetchCEPData(cep);
+  if (!cepData) return false;
+
+  if (coverage.type === "country") {
+    return cepData.uf !== undefined; // Se tem UF, está no Brasil
+  }
+
+  if (coverage.type === "state") {
+    return isStateInCoverage(cepData.uf, coverage);
+  }
+
+  if (coverage.type === "city") {
+    return isCityInCoverage(cepData.localidade, coverage);
+  }
+
+  return false;
+}

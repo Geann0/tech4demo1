@@ -334,3 +334,17 @@ export const PAYMENT_STATUS_LABELS: Record<string, string> = {
   rejected: "Rejeitado",
   cancelled: "Cancelado",
 };
+
+/**
+ * Calcula a taxa de 7.5% sobre um valor
+ */
+export function calculateFeeAmount(value: number): number {
+  return value * 0.075;
+}
+
+/**
+ * Calcula o valor total com taxa de 7.5%
+ */
+export function calculateTotalWithFee(value: number): number {
+  return value + calculateFeeAmount(value);
+}

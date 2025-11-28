@@ -166,11 +166,26 @@ export async function processCheckout(
   console.log("✅ Order created:", orderData.id);
 
   // 2. Create Order Item (produto específico)
+  // ✅ CALCULAR TAXA DA PLATAFORMA: 7.5% para Tech4Loop, 92.5% para parceiro
+  const platformFeeRate = 7.5;
+  const itemTotal = productPrice * 1; // quantity = 1
+  const partnerAmount =
+    Math.round(((itemTotal * (100 - platformFeeRate)) / 100) * 100) / 100; // 92.5%
+  const platformFee =
+    Math.round(((itemTotal * platformFeeRate) / 100) * 100) / 100; // 7.5%
+
+  console.log(
+    `💰 Cálculo de repasse: Total R$ ${itemTotal.toFixed(2)} → Parceiro R$ ${partnerAmount.toFixed(2)} (92.5%) + Plataforma R$ ${platformFee.toFixed(2)} (7.5%)`
+  );
+
   const { error: orderItemError } = await supabase.from("order_items").insert({
     order_id: orderData.id,
     product_id: productId,
     quantity: 1,
     price_at_purchase: productPrice,
+    partner_amount: partnerAmount,
+    platform_fee: platformFee,
+    platform_fee_rate: platformFeeRate,
   });
 
   if (orderItemError) {

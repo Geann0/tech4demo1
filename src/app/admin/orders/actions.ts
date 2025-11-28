@@ -97,7 +97,11 @@ export async function shipOrder(orderId: string, trackingCode?: string) {
     }
   }
 
-  const updateData: any = { status: "shipped" };
+  const updateData: any = {
+    status: "shipped",
+    shipped_at: new Date().toISOString(),
+  };
+
   if (trackingCode) {
     updateData.tracking_code = trackingCode;
   }
@@ -112,12 +116,21 @@ export async function shipOrder(orderId: string, trackingCode?: string) {
     return { error: error.message };
   }
 
+  // Log de auditoria
+  await supabase.from("audit_log").insert({
+    user_id: user.id,
+    action: "SHIP_ORDER",
+    table_name: "orders",
+    record_id: orderId,
+    new_values: updateData,
+    ip_address: null,
+  });
+
   revalidatePath("/admin/orders");
   revalidatePath("/partner/orders");
 
   return { success: true };
 }
 
-export async function deliverOrder(orderId: string) {
-  return updateOrderStatus(orderId, "delivered");
-}
+// REMOVIDO: deliverOrder() - Apenas clientes podem confirmar entrega
+// Auto-confirmação ocorre após 7 dias (CDC)

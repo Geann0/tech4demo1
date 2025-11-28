@@ -26,9 +26,58 @@ const publicRoutes = [
   "/redefinir-senha", // Reset de senha
 ];
 
+// Allowed origins for CSRF protection
+const ALLOWED_ORIGINS = [
+  "https://tech4loop.com",
+  "https://staging.tech4loop.com",
+  "https://www.tech4loop.com",
+  "http://localhost:3000",
+];
+
+/**
+ * Validate CSRF for state-changing requests
+ */
+function validateCSRF(req: NextRequest): boolean {
+  // Only validate POST, PUT, DELETE, PATCH requests
+  if (!["POST", "PUT", "DELETE", "PATCH"].includes(req.method)) {
+    return true;
+  }
+
+  // Check origin header for state-changing requests
+  const origin = req.headers.get("origin");
+  const referer = req.headers.get("referer");
+
+  // If no origin, check referer
+  if (!origin && referer) {
+    const refererOrigin = new URL(referer).origin;
+    return ALLOWED_ORIGINS.includes(refererOrigin);
+  }
+
+  // If origin exists, validate it
+  if (origin) {
+    return ALLOWED_ORIGINS.includes(origin);
+  }
+
+  // For same-site requests (SameSite cookies), allow if no origin header
+  return true;
+}
+
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
   const supabase = createMiddlewareClient({ req, res });
+
+  // 🔐 CSRF Validation for state-changing requests
+  if (!validateCSRF(req)) {
+    console.warn("❌ [CSRF] Request blocked:", {
+      method: req.method,
+      origin: req.headers.get("origin"),
+      referer: req.headers.get("referer"),
+    });
+    return NextResponse.json(
+      { error: "CSRF validation failed" },
+      { status: 403 }
+    );
+  }
 
   // CRÍTICO: Aguardar a sessão ser estabelecida
   const {

@@ -6,6 +6,8 @@ import NewOrderEmail from "@/components/emails/NewOrderEmail";
 import crypto from "crypto";
 import { emitNFe } from "@/lib/nfe-integration";
 import { checkRateLimit, getWebhookIdentifier } from "@/lib/webhookRateLimit";
+import { generateAllOrderDocuments } from "@/lib/label-generator";
+import type { ShippingLabelData, PackingSlipData } from "@/lib/label-generator";
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -138,6 +140,8 @@ export async function POST(request: NextRequest) {
             status: "processing",
             payment_status: "approved",
             payment_id: data.id,
+            auto_approved: true,
+            auto_processed_at: new Date().toISOString(),
           })
           .eq("id", orderId);
 
@@ -173,15 +177,16 @@ export async function POST(request: NextRequest) {
 
             // ✅ ENVIAR EMAIL PARA TODOS OS PARCEIROS ENVOLVIDOS
             console.log(`📧 Enviando emails para parceiros...`);
-            
+
             // Agrupar itens por parceiro
             const partnerGroups = new Map();
-            
+
             for (const item of orderDetails.order_items) {
               const partnerId = item.products?.partner_id;
               const partnerEmail = item.products?.profiles?.email;
-              const partnerName = item.products?.profiles?.partner_name || "Parceiro";
-              
+              const partnerName =
+                item.products?.profiles?.partner_name || "Parceiro";
+
               if (partnerId && partnerEmail) {
                 if (!partnerGroups.has(partnerId)) {
                   partnerGroups.set(partnerId, {
@@ -194,32 +199,146 @@ export async function POST(request: NextRequest) {
               }
             }
 
-            // Enviar email para cada parceiro com SEUS produtos
+            // 📦 GERAR DOCUMENTOS DE ENVIO (Etiquetas, Romaneio)
+            console.log(
+              `📦 Gerando documentos de envio para pedido ${orderId}...`
+            );
+
+            let shippingDocs: {
+              shippingLabel: Buffer;
+              packingSlip: Buffer;
+              insideLabel?: Buffer;
+            } | null = null;
+
+            try {
+              // Buscar dados completos do parceiro (para endereço de remetente)
+              const { data: partnerLegalData } = await supabaseAdmin
+                .from("partner_legal_data")
+                .select("*")
+                .eq(
+                  "partner_id",
+                  orderDetails.order_items[0]?.products?.partner_id
+                )
+                .single();
+
+              // Preparar dados para geração de documentos
+              const documentData: ShippingLabelData & PackingSlipData = {
+                orderId: orderDetails.id,
+                orderCode:
+                  orderDetails.order_code ||
+                  `ORD-${orderDetails.id.slice(0, 8)}`,
+                trackingCode: orderDetails.tracking_code || "PENDENTE",
+                orderDate: new Date(orderDetails.created_at),
+                shippingDate: new Date(),
+
+                // Remetente (Vendedor/Parceiro)
+                senderName:
+                  partnerLegalData?.company_name || "Tech4Loop Marketplace",
+                senderAddress: `${partnerLegalData?.company_street || "Rua Exemplo"}, ${partnerLegalData?.company_number || "000"}`,
+                senderCity: partnerLegalData?.company_city || "São Paulo",
+                senderState: partnerLegalData?.company_state || "SP",
+                senderZip: partnerLegalData?.company_zip || "00000-000",
+                senderPhone: partnerLegalData?.company_phone,
+
+                // Destinatário (Cliente)
+                recipientName: orderDetails.customer_name,
+                recipientAddress: `${orderDetails.customer_address}, ${orderDetails.customer_number || "S/N"}`,
+                recipientCity: orderDetails.customer_city,
+                recipientState: orderDetails.customer_state,
+                recipientZip: orderDetails.customer_cep,
+                recipientPhone: orderDetails.customer_whatsapp,
+
+                // Transportadora
+                carrierName: orderDetails.carrier_name || "Correios",
+                carrierService: "PAC",
+
+                // Itens do pedido
+                items: orderDetails.order_items.map((item: any) => ({
+                  name: item.products?.name || "Produto",
+                  sku: item.products?.sku || item.product_id,
+                  quantity: item.quantity,
+                  price: item.price_at_purchase,
+                })),
+
+                totalAmount: parseFloat(orderDetails.total_amount),
+                paymentMethod:
+                  orderDetails.payment_method === "pix"
+                    ? "PIX"
+                    : orderDetails.payment_method === "credit_card"
+                      ? "Cartão de Crédito"
+                      : orderDetails.payment_method === "boleto"
+                        ? "Boleto"
+                        : "Wallet",
+              };
+
+              shippingDocs = await generateAllOrderDocuments({
+                order: documentData,
+                includeInsideLabel: true,
+              });
+
+              console.log(`✅ Documentos de envio gerados com sucesso`);
+            } catch (docError) {
+              console.error(`❌ Erro ao gerar documentos de envio:`, docError);
+              // Continua sem os documentos
+            }
+
+            // Enviar email para cada parceiro com SEUS produtos + DOCUMENTOS
             for (const partnerId of Array.from(partnerGroups.keys())) {
               const partnerData = partnerGroups.get(partnerId)!;
               const partnerSubtotal = partnerData.items.reduce(
-                (sum: number, item: any) => sum + (item.price_at_purchase * item.quantity),
+                (sum: number, item: any) =>
+                  sum + item.price_at_purchase * item.quantity,
                 0
               );
 
-              console.log(`  → Enviando para ${partnerData.name} (${partnerData.items.length} produto(s), R$ ${partnerSubtotal.toFixed(2)})`);
-              
+              console.log(
+                `  → Enviando para ${partnerData.name} (${partnerData.items.length} produto(s), R$ ${partnerSubtotal.toFixed(2)})`
+              );
+
               try {
-                await resend.emails.send({
+                const emailData: any = {
                   from: "Vendas <vendas@tech4loop.com.br>",
                   to: [partnerData.email],
-                  subject: `Novo Pedido Recebido: ${partnerData.items.length} produto(s) - R$ ${partnerSubtotal.toFixed(2)}`,
-                  react: NewOrderEmail({ 
+                  subject: `Novo Pedido Recebido: ${orderDetails.order_code || orderId.slice(0, 8)} - ${partnerData.items.length} produto(s) - R$ ${partnerSubtotal.toFixed(2)}`,
+                  react: NewOrderEmail({
                     order: {
                       ...orderDetails,
                       order_items: partnerData.items,
                       partner_subtotal: partnerSubtotal,
-                    } 
+                    },
                   }),
-                });
-                console.log(`  ✅ Email enviado para ${partnerData.name}`);
+                };
+
+                // Adicionar documentos como anexos se foram gerados
+                if (shippingDocs) {
+                  emailData.attachments = [
+                    {
+                      filename: `romaneio-${orderDetails.order_code || orderId.slice(0, 8)}.pdf`,
+                      content: shippingDocs.packingSlip,
+                    },
+                    {
+                      filename: `etiqueta-envio-${orderDetails.order_code || orderId.slice(0, 8)}.pdf`,
+                      content: shippingDocs.shippingLabel,
+                    },
+                  ];
+
+                  if (shippingDocs.insideLabel) {
+                    emailData.attachments.push({
+                      filename: `etiqueta-interna-${orderDetails.order_code || orderId.slice(0, 8)}.pdf`,
+                      content: shippingDocs.insideLabel,
+                    });
+                  }
+                }
+
+                await resend.emails.send(emailData);
+                console.log(
+                  `  ✅ Email enviado para ${partnerData.name}${shippingDocs ? " com documentos anexados" : ""}`
+                );
               } catch (emailError) {
-                console.error(`  ❌ Erro ao enviar email para ${partnerData.name}:`, emailError);
+                console.error(
+                  `  ❌ Erro ao enviar email para ${partnerData.name}:`,
+                  emailError
+                );
               }
             }
 
@@ -227,7 +346,9 @@ export async function POST(request: NextRequest) {
             if (partnerGroups.size === 0) {
               const adminEmail = process.env.ADMIN_EMAIL;
               if (adminEmail) {
-                console.log(`  → Enviando para admin (nenhum parceiro encontrado)`);
+                console.log(
+                  `  → Enviando para admin (nenhum parceiro encontrado)`
+                );
                 await resend.emails.send({
                   from: "Vendas <vendas@tech4loop.com.br>",
                   to: [adminEmail],
@@ -244,12 +365,15 @@ export async function POST(request: NextRequest) {
 
             // 🔒 CALCULAR TOTAL baseado nos itens REAIS (price_at_purchase)
             const nfeTotal = orderDetails.order_items.reduce(
-              (sum: number, item: any) => sum + (item.price_at_purchase * item.quantity),
+              (sum: number, item: any) =>
+                sum + item.price_at_purchase * item.quantity,
               0
             );
 
             // ⚠️ VALIDAR se total calculado bate com total do banco
-            if (Math.abs(nfeTotal - parseFloat(orderDetails.total_amount)) > 0.01) {
+            if (
+              Math.abs(nfeTotal - parseFloat(orderDetails.total_amount)) > 0.01
+            ) {
               console.error("⚠️ DIVERGÊNCIA NO TOTAL DA NF-e!");
               console.error("Total calculado:", nfeTotal);
               console.error("Total no BD:", orderDetails.total_amount);
@@ -310,20 +434,51 @@ export async function POST(request: NextRequest) {
 
               // Enviar DANFE para o cliente
               if (nfeResult.danfeUrl) {
-                await resend.emails.send({
+                // Tentar baixar o PDF da DANFE para anexar
+                let danfeBuffer: Buffer | null = null;
+
+                try {
+                  const danfeResponse = await fetch(nfeResult.danfeUrl);
+                  if (danfeResponse.ok) {
+                    const arrayBuffer = await danfeResponse.arrayBuffer();
+                    danfeBuffer = Buffer.from(arrayBuffer);
+                  }
+                } catch (fetchError) {
+                  console.error("❌ Erro ao baixar DANFE:", fetchError);
+                }
+
+                const customerEmailData: any = {
                   from: "Vendas <vendas@tech4loop.com.br>",
                   to: [orderDetails.customer_email],
-                  subject: `Nota Fiscal - Pedido #${orderId}`,
+                  subject: `Nota Fiscal - Pedido #${orderDetails.order_code || orderId.slice(0, 8)}`,
                   html: `
                     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                       <h2>Nota Fiscal Eletrônica</h2>
                       <p>Olá ${orderDetails.customer_name},</p>
                       <p>A Nota Fiscal do seu pedido foi emitida com sucesso!</p>
                       <p><strong>Chave de Acesso:</strong> ${nfeResult.nfeKey}</p>
+                      ${danfeBuffer ? "<p>O arquivo DANFE está anexado a este email.</p>" : ""}
                       <p><a href="${nfeResult.danfeUrl}" style="background-color: #FF6B00; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Baixar DANFE (PDF)</a></p>
+                      <hr style="margin: 20px 0; border: none; border-top: 1px solid #eee;">
+                      <p style="color: #666; font-size: 12px;">
+                        <strong>📦 Acompanhe seu pedido:</strong><br>
+                        Você receberá um email quando seu pedido for enviado com o código de rastreamento.
+                      </p>
                     </div>
                   `,
-                });
+                };
+
+                // Anexar DANFE se foi baixado com sucesso
+                if (danfeBuffer) {
+                  customerEmailData.attachments = [
+                    {
+                      filename: `danfe-${orderDetails.order_code || orderId.slice(0, 8)}.pdf`,
+                      content: danfeBuffer,
+                    },
+                  ];
+                }
+
+                await resend.emails.send(customerEmailData);
               }
             } else {
               console.error(`❌ Falha ao emitir NF-e: ${nfeResult.error}`);

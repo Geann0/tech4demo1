@@ -5,7 +5,6 @@ import {
   approveOrder,
   cancelOrder,
   shipOrder,
-  deliverOrder,
 } from "@/app/admin/orders/actions";
 
 interface OrderActionsProps {
@@ -89,13 +88,14 @@ export default function OrderActions({
       )}
 
       {currentStatus === "shipped" && (
-        <button
-          onClick={() => handleAction(deliverOrder)}
-          disabled={loading}
-          className="px-3 py-1 bg-purple-600 hover:bg-purple-700 rounded text-xs font-medium disabled:opacity-50"
-        >
-          ✓ Marcar como Entregue
-        </button>
+        <div className="flex flex-col gap-2">
+          <span className="text-xs text-yellow-400 font-medium">
+            📦 Aguardando confirmação do cliente
+          </span>
+          <span className="text-xs text-gray-400">
+            Auto-confirma em 7 dias (CDC)
+          </span>
+        </div>
       )}
 
       {(currentStatus === "delivered" || currentStatus === "cancelled") && (

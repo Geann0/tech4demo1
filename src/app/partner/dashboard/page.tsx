@@ -39,11 +39,47 @@ export default async function PartnerDashboard() {
             Ver Pedidos
           </Link>
           <Link
+            href="/partner/complete-profile"
+            className="bg-purple-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-700 transition-shadow"
+          >
+            ⚙️ Dados Legais
+          </Link>
+          <Link
             href="/partner/add-product"
             className="bg-neon-blue text-black font-bold py-2 px-4 rounded-lg hover:shadow-glow transition-shadow"
           >
             Adicionar Produto
           </Link>
+        </div>
+      </div>
+
+      {/* Alert para completar perfil */}
+      <div className="mb-6 p-4 bg-yellow-900/30 border border-yellow-600 rounded-lg">
+        <div className="flex items-start gap-3">
+          <span className="text-2xl">⚠️</span>
+          <div className="flex-1">
+            <h3 className="text-yellow-500 font-bold mb-1">
+              Complete seus dados legais para receber pagamentos
+            </h3>
+            <p className="text-gray-300 text-sm mb-2">
+              Cadastre CPF/CNPJ, dados bancários e chave PIX para receber seus
+              repasses.
+            </p>
+            <div className="flex gap-3">
+              <Link
+                href="/partner/complete-profile"
+                className="inline-block bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-lg transition-colors text-sm"
+              >
+                Completar Perfil Agora →
+              </Link>
+              <Link
+                href="/partner/change-password"
+                className="inline-block bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition-colors text-sm"
+              >
+                🔐 Alterar Senha
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
       <div className="bg-gray-900/50 border border-gray-800 rounded-lg shadow-lg overflow-hidden">

@@ -164,20 +164,37 @@ export async function processCartCheckout(
     // Criar itens do pedido
     console.log(`📝 Criando ${cart.items.length} item(s) do pedido...`);
 
-    const orderItems = cart.items.map((item) => ({
-      order_id: orderData.id,
-      product_id: item.product_id,
-      quantity: item.quantity,
-      price_at_purchase: item.product_price,
-    }));
+    // ✅ CALCULAR TAXA DA PLATAFORMA: 7.5% para Tech4Loop, 92.5% para parceiro
+    const platformFeeRate = 7.5;
+
+    const orderItems = cart.items.map((item) => {
+      const itemTotal = item.product_price * item.quantity;
+      const partnerAmount =
+        Math.round(((itemTotal * (100 - platformFeeRate)) / 100) * 100) / 100; // 92.5%
+      const platformFee =
+        Math.round(((itemTotal * platformFeeRate) / 100) * 100) / 100; // 7.5%
+
+      return {
+        order_id: orderData.id,
+        product_id: item.product_id,
+        quantity: item.quantity,
+        price_at_purchase: item.product_price,
+        partner_amount: partnerAmount,
+        platform_fee: platformFee,
+        platform_fee_rate: platformFeeRate,
+      };
+    });
 
     // Log detalhado de cada item
     orderItems.forEach((item, index) => {
+      const itemTotal = item.price_at_purchase * item.quantity;
       console.log(`Item ${index + 1}:`, {
         product_id: item.product_id,
         quantity: item.quantity,
         price: item.price_at_purchase,
-        subtotal: item.quantity * item.price_at_purchase,
+        subtotal: itemTotal,
+        partner_amount: item.partner_amount,
+        platform_fee: item.platform_fee,
       });
     });
 
@@ -192,7 +209,9 @@ export async function processCartCheckout(
       };
     }
 
-    console.log(`✅ Created ${cart.items.length} order items successfully`);
+    console.log(
+      `✅ Created ${cart.items.length} order items successfully with fee calculation`
+    );
 
     // Criar preferência Mercado Pago
     const client = new MercadoPagoConfig({

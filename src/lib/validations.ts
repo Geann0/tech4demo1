@@ -337,3 +337,31 @@ export function validateData<T>(
 
   return { success: false, errors };
 }
+
+/**
+ * Valida um CEP brasileiro
+ */
+export function validateCEP(cep: string): boolean {
+  const cepRegex = /^\d{5}-?\d{3}$/;
+  return cepRegex.test(cep);
+}
+
+/**
+ * Valida um email
+ */
+export function validateEmail(email: string): boolean {
+  try {
+    return emailSchema.parse(email) !== null;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Valida um telefone brasileiro
+ */
+export function validatePhone(phone: string): boolean {
+  const phoneRegex =
+    /^\(?([1-9]{2})\)?[ ]?([9]{1})?[ ]?([0-9]{4})-?([0-9]{4})$/;
+  return phoneRegex.test(phone);
+}

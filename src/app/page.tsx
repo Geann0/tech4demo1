@@ -69,7 +69,6 @@ export default async function HomePage() {
           <p className="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
             Sinta a inovação. Use o futuro.
           </p>
-          
         </div>
       </section>
 
@@ -118,28 +117,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 3. Seção "Por que escolher a Tech4Loop?" */}
-      <section className="py-16 bg-gray-900/50">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-10">
-            Por que escolher a Tech4Loop?
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-            {whyUsItems.map((item) => (
-              <div key={item.title} className="p-6">
-                {/* Ícone placeholder */}
-                <div className="text-neon-blue mb-4 text-4xl mx-auto w-fit">
-                  ICON
-                </div>
-                <h3 className="text-xl font-bold mb-2">{item.title}</h3>
-                <p className="text-gray-400">{item.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Seção de Destaque do Produto (superior) */}
+      {/* 3. Seção de Destaque do Produto (superior) */}
       {featuredProduct && (
         <section className="py-20 bg-gray-900/50">
           <div className="container mx-auto px-4">
@@ -181,7 +159,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* Nova Seção Novidades */}
+      {/* 4. Nova Seção Novidades */}
       <section className="py-16">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-10">Novidades</h2>
@@ -237,8 +215,29 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 4. Banner Black Friday (condicional) */}
+      {/* 5. Banner Black Friday (condicional) */}
       <BlackFridayBanner />
+
+      {/* 6. Seção "Por que escolher a Tech4Loop?" - MOVIDA PARA O FINAL */}
+      <section className="py-16 bg-gray-900/50">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-10">
+            Por que escolher a Tech4Loop?
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            {whyUsItems.map((item) => (
+              <div key={item.title} className="p-6">
+                {/* Ícone placeholder */}
+                <div className="text-neon-blue mb-4 text-4xl mx-auto w-fit">
+                  ICON
+                </div>
+                <h3 className="text-xl font-bold mb-2">{item.title}</h3>
+                <p className="text-gray-400">{item.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

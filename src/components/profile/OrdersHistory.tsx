@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { formatDate } from "@/lib/utils";
+import { confirmDelivery } from "@/app/conta/compras/actions";
 
 interface Order {
   id: string;
@@ -14,6 +15,12 @@ interface Order {
   customer_address: string;
   customer_city: string;
   customer_state: string;
+  shipped_at?: string;
+  carrier_delivered_at?: string; // Transportadora confirmou entrega
+  delivered_at?: string; // Cliente confirmou recebimento
+  tracking_code?: string;
+  carrier_name?: string;
+  carrier_status?: string;
   order_items?: Array<{
     quantity: number;
     price_at_purchase: number;
@@ -32,6 +39,30 @@ interface OrdersHistoryProps {
 
 export default function OrdersHistory({ orders }: OrdersHistoryProps) {
   const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [confirmingOrder, setConfirmingOrder] = useState<string | null>(null);
+
+  const handleConfirmDelivery = async (orderId: string) => {
+    if (
+      !confirm(
+        "Confirmar que você recebeu este pedido?\n\nApós confirmação, o vendedor receberá o pagamento."
+      )
+    ) {
+      return;
+    }
+
+    setConfirmingOrder(orderId);
+
+    const result = await confirmDelivery(orderId);
+
+    if (result.error) {
+      alert(`Erro: ${result.error}`);
+    } else {
+      alert(result.message);
+      window.location.reload();
+    }
+
+    setConfirmingOrder(null);
+  };
 
   const statusConfig: Record<
     string,
@@ -235,6 +266,112 @@ export default function OrdersHistory({ orders }: OrdersHistoryProps) {
                     {order.customer_address}, {order.customer_city} -{" "}
                     {order.customer_state}
                   </p>
+
+                  {/* Código de Rastreamento */}
+                  {order.tracking_code && (
+                    <div className="mt-3 p-3 bg-blue-900/20 border border-blue-800 rounded-lg">
+                      <p className="text-xs text-blue-400 mb-1">
+                        📦 Código de Rastreamento:
+                      </p>
+                      <p className="text-sm font-mono text-blue-300">
+                        {order.tracking_code}
+                      </p>
+                      {order.carrier_name && (
+                        <p className="text-xs text-gray-400 mt-1">
+                          Transportadora: {order.carrier_name}
+                        </p>
+                      )}
+                      {order.carrier_status && (
+                        <p className="text-xs text-gray-400">
+                          Status: {order.carrier_status}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* AGUARDANDO CONFIRMAÇÃO DA TRANSPORTADORA */}
+                  {order.status === "shipped" &&
+                    !order.carrier_delivered_at && (
+                      <div className="mt-4 p-4 bg-blue-900/20 border border-blue-600 rounded-lg">
+                        <div className="flex items-start gap-3">
+                          <span className="text-2xl">🚚</span>
+                          <div className="flex-1">
+                            <h4 className="text-blue-400 font-bold mb-1">
+                              Pedido em Trânsito
+                            </h4>
+                            <p className="text-sm text-gray-300">
+                              Seu pedido foi enviado e está a caminho!
+                              {order.shipped_at && (
+                                <>
+                                  <br />
+                                  <span className="text-xs text-gray-400">
+                                    Enviado em {formatDate(order.shipped_at)}.
+                                  </span>
+                                </>
+                              )}
+                              <br />
+                              <span className="text-xs text-gray-400">
+                                Você poderá confirmar o recebimento após a
+                                transportadora confirmar a entrega.
+                              </span>
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                  {/* BOTÃO CONFIRMAR ENTREGA (APÓS TRANSPORTADORA CONFIRMAR) */}
+                  {order.status === "shipped" && order.carrier_delivered_at && (
+                    <div className="mt-4 p-4 bg-yellow-900/20 border border-yellow-600 rounded-lg">
+                      <div className="flex items-start gap-3 mb-3">
+                        <span className="text-2xl">📦</span>
+                        <div className="flex-1">
+                          <h4 className="text-yellow-500 font-bold mb-1">
+                            ✓ Transportadora Confirmou Entrega
+                          </h4>
+                          <p className="text-sm text-gray-300 mb-3">
+                            A {order.carrier_name || "transportadora"} confirmou
+                            que seu pedido foi entregue em{" "}
+                            {formatDate(order.carrier_delivered_at)}.
+                            <br />
+                            <br />
+                            <strong className="text-yellow-400">
+                              Você recebeu o pedido corretamente?
+                            </strong>
+                            <br />
+                            Confirme o recebimento para liberar o pagamento ao
+                            vendedor.
+                            <br />
+                            <span className="text-xs text-gray-400">
+                              Se você não confirmar em 7 dias, o recebimento
+                              será confirmado automaticamente (CDC Art. 49).
+                            </span>
+                          </p>
+                          <button
+                            onClick={() => handleConfirmDelivery(order.id)}
+                            disabled={confirmingOrder === order.id}
+                            className="w-full sm:w-auto px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {confirmingOrder === order.id
+                              ? "Confirmando..."
+                              : "✓ Sim, Recebi Meu Pedido"}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Informação de entrega confirmada */}
+                  {order.status === "delivered" && order.delivered_at && (
+                    <div className="mt-3 p-3 bg-green-900/20 border border-green-800 rounded-lg">
+                      <p className="text-xs text-green-400 mb-1">
+                        ✓ Entrega confirmada
+                      </p>
+                      <p className="text-sm text-green-300">
+                        {formatDate(order.delivered_at)}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

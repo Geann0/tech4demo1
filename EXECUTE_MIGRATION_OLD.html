@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Migration: Taxa 7.5% e Dados Legais</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 100%);
+        color: #e5e7eb;
+        padding: 20px;
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: rgba(17, 24, 39, 0.95);
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        overflow: hidden;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+        padding: 30px;
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: 28px;
+        margin-bottom: 10px;
+      }
+
+      .header p {
+        opacity: 0.9;
+        font-size: 16px;
+      }
+
+      .content {
+        padding: 30px;
+      }
+
+      .step {
+        background: rgba(31, 41, 55, 0.8);
+        border-left: 4px solid #3b82f6;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+      }
+
+      .step h2 {
+        color: #60a5fa;
+        margin-bottom: 15px;
+        font-size: 20px;
+      }
+
+      .step p {
+        line-height: 1.6;
+        margin-bottom: 10px;
+      }
+
+      .btn {
+        display: inline-block;
+        background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+        margin: 10px 10px 10px 0;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+        cursor: pointer;
+        border: none;
+        font-size: 14px;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(59, 130, 246, 0.4);
+      }
+
+      .sql-preview {
+        background: #0f172a;
+        border: 1px solid #334155;
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 15px;
+        max-height: 400px;
+        overflow-y: auto;
+        font-family: "Courier New", monospace;
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .sql-preview::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .sql-preview::-webkit-scrollbar-track {
+        background: #1e293b;
+      }
+
+      .sql-preview::-webkit-scrollbar-thumb {
+        background: #475569;
+        border-radius: 4px;
+      }
+
+      .warning {
+        background: rgba(245, 158, 11, 0.1);
+        border-left: 4px solid #f59e0b;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 8px;
+      }
+
+      .success {
+        background: rgba(16, 185, 129, 0.1);
+        border-left: 4px solid #10b981;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 8px;
+      }
+
+      .code {
+        background: #1e293b;
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-family: "Courier New", monospace;
+        font-size: 13px;
+      }
+
+      .badge {
+        display: inline-block;
+        background: #3b82f6;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: bold;
+        margin-right: 8px;
+      }
+
+      #copyMessage {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #10b981;
+        color: white;
+        padding: 15px 25px;
+        border-radius: 8px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        display: none;
+        animation: slideIn 0.3s ease-out;
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateX(400px);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+      }
+
+      .stat-card {
+        background: rgba(31, 41, 55, 0.6);
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+      }
+
+      .stat-card h3 {
+        color: #60a5fa;
+        font-size: 24px;
+        margin-bottom: 5px;
+      }
+
+      .stat-card p {
+        font-size: 13px;
+        opacity: 0.8;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="copyMessage">✅ SQL copiado para a área de transferência!</div>
+
+    <div class="container">
+      <div class="header">
+        <h1>🚀 Migration: Taxa 7.5% e Proteção de Dados</h1>
+        <p>Tech4Loop - Sistema de Marketplace</p>
+      </div>
+
+      <div class="content">
+        <div class="success">
+          <strong>✅ Código TypeScript Atualizado!</strong>
+          <p>
+            Os arquivos <code class="code">actions.ts</code> e
+            <code class="code">cartActions.ts</code> já estão calculando a taxa
+            de 7.5% automaticamente.
+          </p>
+        </div>
+
+        <div class="warning">
+          <strong>⚠️ Ação Necessária:</strong>
+          <p>
+            A migration do banco de dados precisa ser executada manualmente no
+            Supabase SQL Editor.
+          </p>
+        </div>
+
+        <div class="stats">
+          <div class="stat-card">
+            <h3>476</h3>
+            <p>Linhas de SQL</p>
+          </div>
+          <div class="stat-card">
+            <h3>3</h3>
+            <p>Novas Tabelas</p>
+          </div>
+          <div class="stat-card">
+            <h3>7.5%</h3>
+            <p>Taxa Plataforma</p>
+          </div>
+          <div class="stat-card">
+            <h3>🔒</h3>
+            <p>RLS Protegido</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <h2><span class="badge">1</span> Abra o Supabase SQL Editor</h2>
+          <p>Clique no botão abaixo para abrir o SQL Editor em uma nova aba:</p>
+          <a
+            href="https://supabase.com/dashboard/project/plphgrlkszglrawjgtvn/sql/new"
+            target="_blank"
+            class="btn"
+          >
+            🔗 Abrir SQL Editor
+          </a>
+        </div>
+
+        <div class="step">
+          <h2><span class="badge">2</span> Copie o SQL</h2>
+          <p>Clique no botão abaixo para copiar todo o SQL da migration:</p>
+          <button onclick="copySql()" class="btn">
+            📋 Copiar SQL (476 linhas)
+          </button>
+          <button onclick="togglePreview()" class="btn">👁️ Ver Preview</button>
+
+          <div id="sqlPreview" class="sql-preview" style="display: none">
+            <pre id="sqlContent">Carregando SQL...</pre>
+          </div>
+        </div>
+
+        <div class="step">
+          <h2><span class="badge">3</span> Execute no Supabase</h2>
+          <p>1. Cole o SQL no editor do Supabase</p>
+          <p>2. Clique em <strong>RUN</strong> (ou pressione Ctrl+Enter)</p>
+          <p>3. Aguarde 30-60 segundos para conclusão</p>
+        </div>
+
+        <div class="step">
+          <h2><span class="badge">4</span> Verifique a Instalação</h2>
+          <p>Após executar a migration, execute no terminal:</p>
+          <div class="sql-preview">
+            <pre>node scripts/verify-migration.js</pre>
+          </div>
+          <p style="margin-top: 10px">Você deve ver ✅ em todos os testes.</p>
+        </div>
+
+        <div class="success">
+          <strong>📋 O que será criado:</strong>
+          <ul style="margin-top: 10px; line-height: 1.8">
+            <li>
+              ✅ Tabela <code class="code">partner_legal_data</code> - Dados
+              sensíveis protegidos (CPF, CNPJ, banco, PIX)
+            </li>
+            <li>
+              ✅ Tabela <code class="code">partner_payouts</code> - Controle de
+              repasses
+            </li>
+            <li>
+              ✅ Tabela <code class="code">audit_log</code> - Auditoria de ações
+            </li>
+            <li>
+              ✅ Colunas em <code class="code">order_items</code> -
+              partner_amount (92.5%), platform_fee (7.5%)
+            </li>
+            <li>
+              ✅ Colunas em <code class="code">orders</code> - tracking_code,
+              carrier, nfe_pdf_url
+            </li>
+            <li>
+              ✅ Função <code class="code">calculate_platform_fee()</code>
+            </li>
+            <li>✅ RLS Policies - Admin NÃO vê dados legais dos parceiros</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Carregar SQL do arquivo
+      const sqlContent = `-- COLE O CONTEÚDO COMPLETO DO ARQUIVO:
+-- database_migrations/partner_legal_data_and_fees.sql
+
+-- Para obter o SQL completo:
+-- 1. Abra: database_migrations/partner_legal_data_and_fees.sql
+-- 2. Copie todo o conteúdo (Ctrl+A, Ctrl+C)
+-- 3. Cole no SQL Editor do Supabase
+
+-- Ou execute no terminal:
+-- Get-Content database_migrations/partner_legal_data_and_fees.sql | Set-Clipboard`;
+
+      function togglePreview() {
+        const preview = document.getElementById("sqlPreview");
+        const content = document.getElementById("sqlContent");
+
+        if (preview.style.display === "none") {
+          preview.style.display = "block";
+          content.textContent = sqlContent;
+
+          // Tentar carregar o SQL real via fetch (só funciona se servido por servidor)
+          fetch("../database_migrations/partner_legal_data_and_fees.sql")
+            .then((response) => response.text())
+            .then((text) => {
+              content.textContent = text;
+            })
+            .catch((err) => {
+              console.log("Não foi possível carregar o SQL diretamente");
+            });
+        } else {
+          preview.style.display = "none";
+        }
+      }
+
+      function copySql() {
+        // Tentar copiar do elemento
+        const content = document.getElementById("sqlContent");
+        const text = content.textContent;
+
+        navigator.clipboard
+          .writeText(text)
+          .then(() => {
+            showCopyMessage();
+          })
+          .catch((err) => {
+            alert(
+              "❌ Erro ao copiar. Por favor, copie manualmente o arquivo:\ndatabase_migrations/partner_legal_data_and_fees.sql"
+            );
+          });
+      }
+
+      function showCopyMessage() {
+        const message = document.getElementById("copyMessage");
+        message.style.display = "block";
+
+        setTimeout(() => {
+          message.style.display = "none";
+        }, 3000);
+      }
+    </script>
+  </body>
+</html>

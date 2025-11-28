@@ -144,9 +144,9 @@ export default function ProductDetailsClient({
           </div>
 
           {/* Informações do Produto */}
-          <div className="space-y-4 min-w-0">
+          <div className="space-y-6 min-w-0">
             <div className="flex items-start justify-between gap-4">
-              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight break-words flex-1">
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight break-words flex-1 leading-tight">
                 {product.name}
               </h1>
               <FavoriteButton
@@ -155,16 +155,28 @@ export default function ProductDetailsClient({
                 className="flex-shrink-0"
               />
             </div>
+
             {product.categories && (
               <p className="text-sm text-gray-400">{product.categories.name}</p>
             )}
-            <p className="text-3xl text-neon-blue">
+
+            {/* Descrição Curta */}
+            {product.short_description && (
+              <div className="bg-gray-800/30 rounded-lg p-4 border border-gray-700">
+                <p className="text-gray-300 leading-relaxed whitespace-pre-line">
+                  {product.short_description}
+                </p>
+              </div>
+            )}
+
+            <p className="text-4xl font-bold text-neon-blue">
               {new Intl.NumberFormat("pt-BR", {
                 style: "currency",
                 currency: "BRL",
               }).format(product.price)}
             </p>
-            <p className="text-sm text-gray-400 mb-6">
+
+            <p className="text-sm text-gray-400">
               Vendido por: {product.partner_name || "Tech4Loop"}
             </p>
 
@@ -211,15 +223,28 @@ export default function ProductDetailsClient({
         </div>
 
         {/* Descrição e Detalhes */}
-        <section className="mt-16" aria-labelledby="description-heading">
-          <div className="border-b border-gray-700">
-            <h2 id="description-heading" className="text-2xl font-bold py-4">
-              Detalhes do Produto
+        <section
+          className="mt-16 max-w-5xl mx-auto px-4"
+          aria-labelledby="description-heading"
+        >
+          <div className="border-b-2 border-gray-700 mb-8">
+            <h2 id="description-heading" className="text-3xl font-bold py-4">
+              Descrição Completa
             </h2>
           </div>
           {product.description && (
             <div
-              className="prose prose-invert max-w-none text-gray-300 mt-6 break-words"
+              className="prose prose-invert prose-lg max-w-none text-gray-300 leading-relaxed space-y-4 
+                         [&>p]:mb-6 [&>p]:leading-relaxed [&>p]:text-base
+                         [&>h1]:text-2xl [&>h1]:font-bold [&>h1]:mt-8 [&>h1]:mb-4 [&>h1]:text-white
+                         [&>h2]:text-xl [&>h2]:font-bold [&>h2]:mt-6 [&>h2]:mb-3 [&>h2]:text-white
+                         [&>h3]:text-lg [&>h3]:font-semibold [&>h3]:mt-4 [&>h3]:mb-2 [&>h3]:text-gray-100
+                         [&>ul]:list-disc [&>ul]:pl-6 [&>ul]:mb-4 [&>ul]:space-y-2
+                         [&>ol]:list-decimal [&>ol]:pl-6 [&>ol]:mb-4 [&>ol]:space-y-2
+                         [&>li]:leading-relaxed
+                         [&>strong]:text-white [&>strong]:font-semibold
+                         [&>em]:text-gray-400 [&>em]:italic
+                         [&>blockquote]:border-l-4 [&>blockquote]:border-neon-blue [&>blockquote]:pl-4 [&>blockquote]:italic [&>blockquote]:my-4"
               dangerouslySetInnerHTML={{
                 __html: sanitizeHTML(product.description),
               }}
@@ -230,20 +255,23 @@ export default function ProductDetailsClient({
         {/* Especificações Técnicas */}
         {product.technical_specs &&
           Object.keys(product.technical_specs).length > 0 && (
-            <section className="mt-10" aria-labelledby="specs-heading">
-              <div className="border-b border-gray-700">
-                <h2 id="specs-heading" className="text-2xl font-bold py-4">
+            <section
+              className="mt-12 max-w-5xl mx-auto px-4"
+              aria-labelledby="specs-heading"
+            >
+              <div className="border-b-2 border-gray-700 mb-8">
+                <h2 id="specs-heading" className="text-3xl font-bold py-4">
                   Especificações Técnicas
                 </h2>
               </div>
-              <ul className="mt-6 space-y-2 text-gray-300">
+              <ul className="mt-6 space-y-3 text-gray-300 bg-gray-800/30 rounded-lg p-6">
                 {Object.entries(product.technical_specs).map(([key, value]) => (
                   <li
                     key={key}
-                    className="flex justify-between border-b border-gray-800 py-2"
+                    className="flex justify-between gap-4 border-b border-gray-700 py-3 last:border-0"
                   >
-                    <span className="font-semibold">{key}:</span>
-                    <span>{String(value)}</span>
+                    <span className="font-semibold text-gray-100">{key}:</span>
+                    <span className="text-right">{String(value)}</span>
                   </li>
                 ))}
               </ul>
@@ -252,15 +280,21 @@ export default function ProductDetailsClient({
 
         {/* Conteúdo da Caixa */}
         {product.box_contents && product.box_contents.length > 0 && (
-          <section className="mt-10" aria-labelledby="box-contents-heading">
-            <div className="border-b border-gray-700">
-              <h2 id="box-contents-heading" className="text-2xl font-bold py-4">
+          <section
+            className="mt-12 max-w-5xl mx-auto px-4"
+            aria-labelledby="box-contents-heading"
+          >
+            <div className="border-b-2 border-gray-700 mb-8">
+              <h2 id="box-contents-heading" className="text-3xl font-bold py-4">
                 Conteúdo da Caixa
               </h2>
             </div>
-            <ul className="mt-6 list-disc list-inside space-y-2 text-gray-300">
+            <ul className="mt-6 list-none space-y-3 text-gray-300 bg-gray-800/30 rounded-lg p-6">
               {product.box_contents.map((item: string, index: number) => (
-                <li key={index}>{item}</li>
+                <li key={index} className="flex items-start gap-3 py-2">
+                  <span className="text-neon-blue flex-shrink-0">✓</span>
+                  <span className="leading-relaxed">{item}</span>
+                </li>
               ))}
             </ul>
           </section>

@@ -65,6 +65,9 @@ export interface OrderItem {
   product_id: string;
   quantity: number;
   price_at_purchase: number;
+  partner_amount?: number; // 92.5% do valor para o parceiro
+  platform_fee?: number; // 7.5% do valor para a plataforma
+  platform_fee_rate?: number; // Taxa da plataforma (padrão 7.5%)
   created_at: string;
   products?: Product | null;
 }

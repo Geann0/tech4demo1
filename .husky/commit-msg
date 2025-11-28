@@ -1,0 +1,10 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "📋 Validating commit message..."
+# Simples validação: commit message não pode estar vazia
+if [ -z "$(cat $1)" ]; then
+  echo "❌ Commit message cannot be empty!"
+  exit 1
+fi
+echo "✅ Commit message valid!"

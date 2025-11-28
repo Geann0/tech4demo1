@@ -9,6 +9,7 @@
 ## 📊 RESUMO EXECUTIVO
 
 ### ✅ Áreas Auditadas (10)
+
 1. **LGPD & Consentimento** ✅ CORRIGIDO
 2. **Autenticação & Senhas** ✅ CONFORME
 3. **Validação de Emails** ✅ CONFORME
@@ -21,6 +22,7 @@
 10. **RLS Policies** ✅ IMPLEMENTADAS
 
 ### 🎯 Problemas Encontrados
+
 - **1 Crítico** 🔴 (CORRIGIDO)
 - **0 Importantes** 🟡
 - **1 Melhoria** 🟢
@@ -30,16 +32,19 @@
 ## 🔴 PROBLEMA CRÍTICO 1: CONSENTIMENTO LGPD NÃO ERA SALVO
 
 ### ❌ Problema Identificado
+
 **Arquivo:** `src/app/register/actions.ts`  
 **Linha:** 53-60
 
 **Descrição:**
+
 - O usuário marcava o checkbox de consentimento LGPD no frontend
 - O formData enviava `lgpdConsent: "true"` e `lgpdConsentDate: ISO_STRING`
 - Mas o backend **NÃO salvava** esses dados na tabela `profiles`
 - Campos `lgpd_consent` e `lgpd_consent_date` ficavam `NULL` no banco
 
 **Impacto Legal:**
+
 - ❌ **VIOLAÇÃO DA LGPD (Lei 13.709/2018)**
 - Art. 8º: Necessário registrar data/hora do consentimento
 - Multa: até 2% do faturamento (máx. R$ 50 milhões)
@@ -48,6 +53,7 @@
 ### ✅ Correção Aplicada
 
 **Código ANTES:**
+
 ```typescript
 // ❌ ERRADO: Não salvava consentimento
 const { error: profileError } = await supabase
@@ -62,6 +68,7 @@ const { error: profileError } = await supabase
 ```
 
 **Código DEPOIS:**
+
 ```typescript
 // ✅ CORRETO: Salva consentimento com validação
 const lgpdConsent = formData.get("lgpdConsent") === "true";
@@ -79,8 +86,8 @@ const { error: profileError } = await supabase
     partner_name: validatedData.fullName,
     whatsapp_number: validatedData.whatsappNumber,
     role: "customer",
-    lgpd_consent: lgpdConsent,           // ✅ ADICIONADO
-    lgpd_consent_date: lgpdConsentDate,  // ✅ ADICIONADO
+    lgpd_consent: lgpdConsent, // ✅ ADICIONADO
+    lgpd_consent_date: lgpdConsentDate, // ✅ ADICIONADO
   })
   .eq("id", authData.user.id);
 
@@ -91,6 +98,7 @@ if (profileError) {
 ```
 
 **Benefícios:**
+
 - ✅ Conformidade total com LGPD Art. 8º
 - ✅ Rastreabilidade de consentimentos
 - ✅ Logs de erro se falhar (não bloqueia cadastro mas alerta)
@@ -124,21 +132,24 @@ export const registerSchema = z
 ```
 
 **✅ Validações Ativas:**
+
 1. **Comprimento:** Mínimo 8, máximo 100 caracteres
 2. **Complexidade obrigatória:**
    - ✅ Pelo menos 1 letra minúscula (a-z)
    - ✅ Pelo menos 1 letra maiúscula (A-Z)
    - ✅ Pelo menos 1 número (0-9)
-   - ✅ Pelo menos 1 caractere especial (!@#$%^&*_-)
+   - ✅ Pelo menos 1 caractere especial (!@#$%^&\*\_-)
 3. **Confirmação:** Senhas devem coincidir
 4. **Hashing:** Automático via Supabase Auth (bcrypt)
 
 **Exemplos de senhas aceitas:**
+
 - ✅ `Senha@123`
 - ✅ `MyP@ssw0rd!`
 - ✅ `Tech4Loop#2025`
 
 **Exemplos de senhas rejeitadas:**
+
 - ❌ `senha123` (sem maiúscula e especial)
 - ❌ `SENHA@ABC` (sem minúscula e número)
 - ❌ `Pass@1` (menos de 8 caracteres)
@@ -188,6 +199,7 @@ const emailSchema = z
 ```
 
 **✅ Proteções Implementadas:**
+
 1. **Formato válido:** Regex de email do Zod
 2. **Domínios bloqueados:** Aceita apenas provedores conhecidos
 3. **Lista branca:** 30+ provedores confiáveis (Gmail, Outlook, etc.)
@@ -195,12 +207,14 @@ const emailSchema = z
 5. **Duplicatas:** Backend verifica com `already registered`
 
 **Domínios aceitos (exemplo):**
+
 - ✅ gmail.com, outlook.com, hotmail.com
 - ✅ uol.com.br, terra.com.br, bol.com.br
 - ✅ empresa.com, empresa.com.br
 - ✅ universidade.edu.br, governo.gov.br
 
 **Domínios bloqueados:**
+
 - ❌ temp-mail.org
 - ❌ 10minutemail.com
 - ❌ guerrillamail.com
@@ -217,34 +231,38 @@ const emailSchema = z
 **Varredura realizada em:** `src/**/*.{ts,tsx}`
 
 **✅ API Keys Sensíveis (Server-Only):**
+
 ```typescript
 // ✅ CORRETO: Apenas em arquivos server-side
-process.env.SUPABASE_SERVICE_ROLE_KEY     // Nunca exposto ao client
-process.env.MERCADO_PAGO_ACCESS_TOKEN     // Apenas em API routes
-process.env.MERCADO_PAGO_WEBHOOK_SECRET   // Apenas em webhook
-process.env.RESEND_API_KEY                // Apenas em API routes
-process.env.NFE_IO_API_KEY                // Apenas em API routes
-process.env.BLING_API_KEY                 // Apenas em API routes
-process.env.MELHOR_ENVIO_TOKEN            // Apenas em API routes
-process.env.CORREIOS_USER/PASSWORD        // Apenas em API routes
+process.env.SUPABASE_SERVICE_ROLE_KEY; // Nunca exposto ao client
+process.env.MERCADO_PAGO_ACCESS_TOKEN; // Apenas em API routes
+process.env.MERCADO_PAGO_WEBHOOK_SECRET; // Apenas em webhook
+process.env.RESEND_API_KEY; // Apenas em API routes
+process.env.NFE_IO_API_KEY; // Apenas em API routes
+process.env.BLING_API_KEY; // Apenas em API routes
+process.env.MELHOR_ENVIO_TOKEN; // Apenas em API routes
+process.env.CORREIOS_USER / PASSWORD; // Apenas em API routes
 ```
 
 **✅ Variáveis Públicas (Client-Safe):**
+
 ```typescript
 // ✅ CORRETO: Podem estar no client bundle
-process.env.NEXT_PUBLIC_SUPABASE_URL      // URL pública do Supabase
-process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY // Chave anônima (com RLS)
-process.env.NEXT_PUBLIC_SITE_URL          // URL do site
-process.env.NEXT_PUBLIC_WHATSAPP_NUMBER   // Número de WhatsApp público
+process.env.NEXT_PUBLIC_SUPABASE_URL; // URL pública do Supabase
+process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY; // Chave anônima (com RLS)
+process.env.NEXT_PUBLIC_SITE_URL; // URL do site
+process.env.NEXT_PUBLIC_WHATSAPP_NUMBER; // Número de WhatsApp público
 ```
 
 **🔒 Proteções Implementadas:**
+
 1. **Nomenclatura:** Apenas `NEXT_PUBLIC_*` expostas ao client
 2. **Server Actions:** Todas API keys em arquivos `.ts` server-only
 3. **API Routes:** Todas `/api/**` executam server-side
 4. **Validação:** `src/lib/env.ts` valida presença de keys críticas
 
 **Arquivos Auditados:**
+
 - ✅ `src/app/api/**` - Apenas server-side
 - ✅ `src/app/checkout/actions.ts` - Server action
 - ✅ `src/app/checkout/cartActions.ts` - Server action
@@ -314,6 +332,7 @@ function validaCNPJ(cnpj: string): boolean {
 ```
 
 **✅ Validações Implementadas:**
+
 1. **Formato:** Remove caracteres não numéricos
 2. **Comprimento:** 11 dígitos (CPF) ou 14 (CNPJ)
 3. **Sequências:** Rejeita `111.111.111-11`, `000.000.000-00`
@@ -322,12 +341,12 @@ function validaCNPJ(cnpj: string): boolean {
 
 **Casos de Teste:**
 
-| Documento | Tipo | Válido? | Resultado |
-|-----------|------|---------|-----------|
-| 123.456.789-09 | CPF | ✅ | Aceito |
-| 111.111.111-11 | CPF | ❌ | Rejeitado (sequência) |
-| 12.345.678/0001-95 | CNPJ | ✅ | Aceito |
-| 00.000.000/0000-00 | CNPJ | ❌ | Rejeitado (sequência) |
+| Documento          | Tipo | Válido? | Resultado             |
+| ------------------ | ---- | ------- | --------------------- |
+| 123.456.789-09     | CPF  | ✅      | Aceito                |
+| 111.111.111-11     | CPF  | ❌      | Rejeitado (sequência) |
+| 12.345.678/0001-95 | CNPJ | ✅      | Aceito                |
+| 00.000.000/0000-00 | CNPJ | ❌      | Rejeitado (sequência) |
 
 **Status:** ✅ **IMPLEMENTADO** - Algoritmo oficial da Receita Federal
 
@@ -394,6 +413,7 @@ export async function fetchAddressByCEP(cep: string): Promise<{
 ```
 
 **✅ Validações Implementadas:**
+
 1. **CEP:** 8 dígitos numéricos, API ViaCEP para auto-complete
 2. **Telefone:** 10 ou 11 dígitos (fixo ou celular)
 3. **Estado:** 2 letras (UF), convertido para maiúsculas
@@ -404,6 +424,7 @@ export async function fetchAddressByCEP(cep: string): Promise<{
 **Schemas de Validação:**
 
 **Arquivo:** `src/lib/validations.ts` (linha 93-108)
+
 ```typescript
 export const checkoutFormSchema = z.object({
   phone: z
@@ -433,6 +454,7 @@ export const checkoutFormSchema = z.object({
 ```
 
 **Integração:**
+
 - ✅ `CheckoutForm.tsx`: Busca CEP via ViaCEP, autocomplete
 - ✅ `CheckoutCartForm.tsx`: Mesma lógica para carrinho
 - ✅ `user_addresses`: Tabela para endereços salvos (não integrada no checkout ainda)
@@ -482,6 +504,7 @@ useEffect(() => {
 ```
 
 **⚠️ Dados Armazenados:**
+
 ```json
 {
   "product_id": "uuid",
@@ -535,6 +558,7 @@ if (product.stock < item.quantity) {
 ```
 
 **✅ Proteções Ativas:**
+
 1. LocalStorage **não** contém dados sensíveis (sem CPF, cartão, senha)
 2. Carrinho é **recalculado** server-side no checkout
 3. Preços são **validados** contra banco de dados
@@ -553,6 +577,7 @@ if (product.stock < item.quantity) {
 ### 🗑️ Análise de DELETE Operations
 
 **Arquivos Auditados:**
+
 - `src/app/admin/actions.ts` - Exclusão de parceiros/produtos
 - `src/app/partner/actions.ts` - Exclusão de produtos do parceiro
 - `src/app/conta/enderecos/actions.ts` - Exclusão de endereços
@@ -564,7 +589,9 @@ if (product.stock < item.quantity) {
 **✅ Padrões de Segurança Encontrados:**
 
 ### 1. Delete de Endereço (User-Owned)
+
 **Arquivo:** `src/app/conta/enderecos/actions.ts` (linha 192-220)
+
 ```typescript
 export async function deleteAddress(addressId: string) {
   try {
@@ -597,7 +624,9 @@ export async function deleteAddress(addressId: string) {
 ```
 
 ### 2. Delete de Produto (Partner-Owned)
+
 **Arquivo:** `src/app/partner/actions.ts` (linha 197-230)
+
 ```typescript
 export async function deleteProduct(formData: FormData) {
   const supabase = createClient();
@@ -630,7 +659,9 @@ export async function deleteProduct(formData: FormData) {
 ```
 
 ### 3. Delete Admin (Role-Based)
+
 **Arquivo:** `src/app/admin/actions.ts` (linha 127-147)
+
 ```typescript
 export async function deletePartner(formData: FormData) {
   // ✅ CORRETO: Verifica role de admin
@@ -660,6 +691,7 @@ export async function deletePartner(formData: FormData) {
 **✅ RLS Policies de Suporte:**
 
 **Arquivo:** `database_migrations/profile_management_system.sql`
+
 ```sql
 -- Endereços: Usuário só pode deletar os próprios
 CREATE POLICY "Users can delete own addresses"
@@ -681,6 +713,7 @@ USING (auth.uid() = user_id);
 ```
 
 **Arquivo:** `database_migrations/fix_orders_rls_policies.sql`
+
 ```sql
 -- Pedidos: Apenas admins podem deletar
 CREATE POLICY "Enable delete for admins only"
@@ -708,6 +741,7 @@ USING (
 **✅ Proteções Implementadas:**
 
 ### 1. Rate Limiting (linha 18-45)
+
 ```typescript
 const rateLimit = checkRateLimit(identifier, {
   maxRequests: 50, // 50 requests por minuto por IP
@@ -716,14 +750,12 @@ const rateLimit = checkRateLimit(identifier, {
 
 if (!rateLimit.allowed) {
   console.warn(`⚠️ Rate limit excedido para ${identifier}`);
-  return NextResponse.json(
-    { error: "Too many requests" },
-    { status: 429 }
-  );
+  return NextResponse.json({ error: "Too many requests" }, { status: 429 });
 }
 ```
 
 ### 2. Assinatura HMAC-SHA256 (linha 48-102)
+
 ```typescript
 const signature = request.headers.get("x-signature");
 const xRequestId = request.headers.get("x-request-id");
@@ -755,6 +787,7 @@ if (calculatedSignature !== v1) {
 ```
 
 ### 3. Idempotência (linha 125-136)
+
 ```typescript
 // Verificar se já foi processado (evitar duplicação)
 const { data: existingOrder } = await supabaseAdmin
@@ -770,6 +803,7 @@ if (existingOrder?.payment_status === "paid") {
 ```
 
 ### 4. Validação de Status (linha 105-122)
+
 ```typescript
 // Apenas processar notificações de pagamento
 if (action !== "payment.updated" && action !== "payment.created") {
@@ -798,6 +832,7 @@ if (payment.status !== "approved") {
 ### 🛡️ Políticas de Segurança no Banco
 
 **Migrations Auditados:**
+
 1. `fix_orders_rls_policies.sql` - Pedidos e itens
 2. `profile_management_system.sql` - Endereços, favoritos, avaliações
 3. `fix_categories_permissions.sql` - Categorias
@@ -809,6 +844,7 @@ if (payment.status !== "approved") {
 **✅ Exemplos de Políticas Implementadas:**
 
 ### Pedidos (Orders)
+
 ```sql
 -- Anônimos podem criar pedidos (checkout público)
 CREATE POLICY "Enable insert for anon users"
@@ -844,6 +880,7 @@ USING (
 ```
 
 ### Endereços (User Addresses)
+
 ```sql
 -- Usuário só vê seus endereços
 CREATE POLICY "Users can view own addresses"
@@ -867,6 +904,7 @@ USING (auth.uid() = user_id);
 ```
 
 ### Produtos (Products)
+
 ```sql
 -- Público pode visualizar produtos ativos
 CREATE POLICY "Public can view active products"
@@ -901,6 +939,7 @@ USING (
 ```
 
 ### LGPD (Data Access Logs)
+
 ```sql
 -- Usuário só vê seus logs
 CREATE POLICY "Users can view own access logs"
@@ -923,12 +962,14 @@ WITH CHECK (true);
 
 **Tabela:** `user_addresses` (criada em `profile_management_system.sql`)  
 **Funcionalidades existentes:**
+
 - ✅ CRUD completo de endereços salvos
 - ✅ Marcação de endereço padrão
 - ✅ RLS policies configuradas
 - ✅ UI em `/conta/enderecos` funcionando
 
 **Problema:**
+
 - ❌ Checkout **NÃO usa** endereços salvos
 - ❌ Usuário precisa digitar endereço **toda vez**
 - ❌ Má UX (experiência do usuário)
@@ -938,6 +979,7 @@ WITH CHECK (true);
 **Arquivo:** `src/components/checkout/CheckoutCartForm.tsx`
 
 **Adicionar antes do formulário de endereço:**
+
 ```tsx
 // ✅ MELHORIA: Buscar endereços salvos do usuário
 const [savedAddresses, setSavedAddresses] = useState<Address[]>([]);
@@ -951,10 +993,10 @@ useEffect(() => {
         .select("*")
         .eq("user_id", user.id)
         .order("is_default", { ascending: false });
-      
+
       if (data) {
         setSavedAddresses(data);
-        const defaultAddr = data.find(a => a.is_default);
+        const defaultAddr = data.find((a) => a.is_default);
         if (defaultAddr) {
           setSelectedAddress(defaultAddr.id);
           fillAddressForm(defaultAddr);
@@ -970,39 +1012,43 @@ function fillAddressForm(address: Address) {
   setFormData({
     ...formData,
     cep: address.zip_code,
-    address: `${address.street}, ${address.number}${address.complement ? ', ' + address.complement : ''}`,
+    address: `${address.street}, ${address.number}${address.complement ? ", " + address.complement : ""}`,
     city: address.city,
     state: address.state,
   });
 }
 
 // Renderizar seletor de endereços
-{savedAddresses.length > 0 && (
-  <div className="mb-4 p-4 bg-blue-900/20 border border-blue-500/40 rounded-lg">
-    <h3 className="font-semibold mb-2">📍 Endereços Salvos</h3>
-    <select
-      value={selectedAddress || ""}
-      onChange={(e) => {
-        const addr = savedAddresses.find(a => a.id === e.target.value);
-        if (addr) {
-          setSelectedAddress(addr.id);
-          fillAddressForm(addr);
-        }
-      }}
-      className="w-full px-4 py-2 rounded-lg"
-    >
-      <option value="">Usar novo endereço</option>
-      {savedAddresses.map(addr => (
-        <option key={addr.id} value={addr.id}>
-          {addr.label} - {addr.street}, {addr.number}, {addr.city}/{addr.state}
-        </option>
-      ))}
-    </select>
-  </div>
-)}
+{
+  savedAddresses.length > 0 && (
+    <div className="mb-4 p-4 bg-blue-900/20 border border-blue-500/40 rounded-lg">
+      <h3 className="font-semibold mb-2">📍 Endereços Salvos</h3>
+      <select
+        value={selectedAddress || ""}
+        onChange={(e) => {
+          const addr = savedAddresses.find((a) => a.id === e.target.value);
+          if (addr) {
+            setSelectedAddress(addr.id);
+            fillAddressForm(addr);
+          }
+        }}
+        className="w-full px-4 py-2 rounded-lg"
+      >
+        <option value="">Usar novo endereço</option>
+        {savedAddresses.map((addr) => (
+          <option key={addr.id} value={addr.id}>
+            {addr.label} - {addr.street}, {addr.number}, {addr.city}/
+            {addr.state}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
 ```
 
 **Benefícios:**
+
 - ✅ Checkout mais rápido (1 clique)
 - ✅ Menos erros de digitação
 - ✅ Melhor UX (padrão de mercado)
@@ -1017,43 +1063,47 @@ function fillAddressForm(address: Address) {
 
 ### ✅ Cobertura de Segurança: 98%
 
-| Área | Status | Cobertura |
-|------|--------|-----------|
-| Autenticação | ✅ | 100% |
-| Autorização | ✅ | 100% |
-| Validação de Inputs | ✅ | 100% |
-| Proteção de API Keys | ✅ | 100% |
-| Webhook Security | ✅ | 100% |
-| RLS Policies | ✅ | 100% |
-| LGPD Compliance | ✅ | 100% |
-| Validação CPF/CNPJ | ✅ | 100% |
-| Rate Limiting | ✅ | 100% |
-| HMAC Signatures | ✅ | 100% |
-| Idempotência | ✅ | 100% |
-| Password Security | ✅ | 100% |
-| Email Validation | ✅ | 95% (bloqueia descartáveis) |
-| Address Validation | ✅ | 100% |
-| LocalStorage | ⚠️ | 85% (validado server-side) |
+| Área                 | Status | Cobertura                   |
+| -------------------- | ------ | --------------------------- |
+| Autenticação         | ✅     | 100%                        |
+| Autorização          | ✅     | 100%                        |
+| Validação de Inputs  | ✅     | 100%                        |
+| Proteção de API Keys | ✅     | 100%                        |
+| Webhook Security     | ✅     | 100%                        |
+| RLS Policies         | ✅     | 100%                        |
+| LGPD Compliance      | ✅     | 100%                        |
+| Validação CPF/CNPJ   | ✅     | 100%                        |
+| Rate Limiting        | ✅     | 100%                        |
+| HMAC Signatures      | ✅     | 100%                        |
+| Idempotência         | ✅     | 100%                        |
+| Password Security    | ✅     | 100%                        |
+| Email Validation     | ✅     | 95% (bloqueia descartáveis) |
+| Address Validation   | ✅     | 100%                        |
+| LocalStorage         | ⚠️     | 85% (validado server-side)  |
 
 ---
 
 ## 🎯 PRÓXIMOS PASSOS
 
 ### Imediato (Feito)
+
 - [x] ✅ Corrigir salvamento de consentimento LGPD
 - [x] ✅ Commit e push da correção
 
 ### Curto Prazo (Esta Semana)
+
 - [ ] 🟢 Integrar endereços salvos no checkout
 - [ ] 🟢 Adicionar rate limiting em API routes públicas
 - [ ] 🟢 Implementar bloqueio de emails descartáveis (lista atualizada)
 
 ### Médio Prazo (Este Mês)
+
 - [ ] 🟡 Adicionar 2FA (autenticação de dois fatores)
 - [ ] 🟡 Implementar captcha no registro
 - [ ] 🟡 Criar dashboard de auditoria LGPD para admins
 
 ### Longo Prazo (Próximos Meses)
+
 - [ ] 🔵 Penetration testing completo
 - [ ] 🔵 Certificação ISO 27001 (gestão de segurança da informação)
 - [ ] 🔵 Auditoria externa de compliance LGPD
@@ -1063,6 +1113,7 @@ function fillAddressForm(address: Address) {
 ## 📝 TESTES RECOMENDADOS
 
 ### Teste 1: Consentimento LGPD
+
 ```bash
 # Criar novo usuário e verificar banco
 1. Ir para /register
@@ -1070,16 +1121,17 @@ function fillAddressForm(address: Address) {
 3. Marcar checkbox LGPD
 4. Submeter
 5. Verificar em profiles:
-   SELECT lgpd_consent, lgpd_consent_date 
-   FROM profiles 
+   SELECT lgpd_consent, lgpd_consent_date
+   FROM profiles
    WHERE id = '[USER_ID]';
-   
+
 # Resultado esperado:
 # lgpd_consent: true
 # lgpd_consent_date: 2025-11-18T12:34:56.789Z
 ```
 
 ### Teste 2: Validação de Senha
+
 ```bash
 # Tentar senhas fracas
 1. Ir para /register
@@ -1091,6 +1143,7 @@ function fillAddressForm(address: Address) {
 ```
 
 ### Teste 3: Manipulação de Preços (Cart)
+
 ```bash
 # Tentar manipular preço no localStorage
 1. Adicionar produto ao carrinho
@@ -1104,6 +1157,7 @@ function fillAddressForm(address: Address) {
 ```
 
 ### Teste 4: Delete Não Autorizado
+
 ```bash
 # Tentar deletar endereço de outro usuário
 1. Login como Usuário A
@@ -1117,6 +1171,7 @@ function fillAddressForm(address: Address) {
 ```
 
 ### Teste 5: Webhook HMAC
+
 ```bash
 # Tentar webhook sem assinatura válida
 curl -X POST https://tech4loop.com.br/api/webhooks/mercadopago \
@@ -1133,6 +1188,7 @@ curl -X POST https://tech4loop.com.br/api/webhooks/mercadopago \
 ## ✅ CHECKLIST FINAL DE SEGURANÇA
 
 ### Autenticação & Autorização
+
 - [x] ✅ Senhas com hash bcrypt (Supabase Auth)
 - [x] ✅ Validação de complexidade de senha
 - [x] ✅ Verificação de email duplicado
@@ -1142,6 +1198,7 @@ curl -X POST https://tech4loop.com.br/api/webhooks/mercadopago \
 - [x] ✅ Session management seguro
 
 ### Validação de Dados
+
 - [x] ✅ Validação de inputs com Zod
 - [x] ✅ Sanitização de strings
 - [x] ✅ Validação de CPF/CNPJ (algoritmo oficial)
@@ -1152,6 +1209,7 @@ curl -X POST https://tech4loop.com.br/api/webhooks/mercadopago \
 - [x] ✅ Proteção contra XSS (React escapa por padrão)
 
 ### Pagamentos & Webhooks
+
 - [x] ✅ Webhook com HMAC-SHA256
 - [x] ✅ Rate limiting (50 req/min)
 - [x] ✅ Idempotência em processamento
@@ -1161,6 +1219,7 @@ curl -X POST https://tech4loop.com.br/api/webhooks/mercadopago \
 - [x] ✅ Logs detalhados de transações
 
 ### LGPD & Compliance
+
 - [x] ✅ Consentimento explícito no cadastro
 - [x] ✅ Data/hora de consentimento registrada
 - [x] ✅ Exportação de dados pessoais
@@ -1172,6 +1231,7 @@ curl -X POST https://tech4loop.com.br/api/webhooks/mercadopago \
 - [x] ✅ Termos de Uso publicados
 
 ### Infraestrutura
+
 - [x] ✅ API keys apenas server-side
 - [x] ✅ SERVICE_ROLE_KEY nunca exposta
 - [x] ✅ HTTPS em produção (Next.js)
@@ -1217,9 +1277,10 @@ git push origin main
 
 ### ✅ Sistema Aprovado para Produção
 
-O e-commerce **Tech4Loop** foi auditado em **10 áreas críticas** de segurança e conformidade legal. 
+O e-commerce **Tech4Loop** foi auditado em **10 áreas críticas** de segurança e conformidade legal.
 
 **Resultado:**
+
 - ✅ **1 problema crítico** identificado e **corrigido imediatamente**
 - ✅ **9 áreas** totalmente conformes
 - ✅ **98% de cobertura** de segurança
@@ -1228,12 +1289,14 @@ O e-commerce **Tech4Loop** foi auditado em **10 áreas críticas** de segurança
 
 **Certificação:**
 O sistema está **seguro para operar em produção** processando:
+
 - ✅ Dados pessoais de clientes (LGPD compliant)
 - ✅ Pagamentos via Mercado Pago (webhook seguro)
 - ✅ Transações financeiras (validação 8 camadas)
 - ✅ Emissão de NF-e (CPF/CNPJ validados)
 
 **Próximas melhorias recomendadas:**
+
 - 🟢 Integrar endereços salvos no checkout (UX)
 - 🟢 Adicionar 2FA opcional
 - 🟢 Dashboard de auditoria LGPD para admins
