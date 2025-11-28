@@ -3,9 +3,9 @@
 /**
  * Performance Testing - Phase 3 Part 2
  * Comprehensive performance validation and monitoring setup
- * 
+ *
  * Usage: node scripts/performance-testing.js
- * 
+ *
  * Validates:
  * - Lighthouse scores (performance, accessibility, best practices, SEO)
  * - Core Web Vitals (LCP, FID, CLS)
@@ -14,11 +14,11 @@
  * - Image optimization effectiveness
  */
 
-const { execSync } = require('child_process');
-const path = require('path');
-const fs = require('fs');
+const { execSync } = require("child_process");
+const path = require("path");
+const fs = require("fs");
 
-const projectRoot = path.join(__dirname, '..');
+const projectRoot = path.join(__dirname, "..");
 
 function log(step, message) {
   const timestamp = new Date().toLocaleTimeString();
@@ -41,104 +41,109 @@ function runCommand(command, options = {}) {
   try {
     const output = execSync(command, {
       cwd: projectRoot,
-      encoding: 'utf-8',
-      stdio: 'pipe',
-      ...options
+      encoding: "utf-8",
+      stdio: "pipe",
+      ...options,
     });
     return { success: true, output };
   } catch (error) {
-    return { success: false, error: error.message, output: error.stdout || '' };
+    return { success: false, error: error.message, output: error.stdout || "" };
   }
 }
 
 async function performanceTesting() {
-  console.log('\n' + '='.repeat(70));
-  console.log('📊 PHASE 3 PART 2: PERFORMANCE TESTING');
-  console.log('Comprehensive Performance Validation');
-  console.log('='.repeat(70));
+  console.log("\n" + "=".repeat(70));
+  console.log("📊 PHASE 3 PART 2: PERFORMANCE TESTING");
+  console.log("Comprehensive Performance Validation");
+  console.log("=".repeat(70));
 
   try {
     // Step 1: Build Production Bundle
-    log('Step 1', 'Building Production Bundle...');
-    console.log('   Building optimized production bundle...');
-    const buildResult = runCommand('npm run build 2>&1');
+    log("Step 1", "Building Production Bundle...");
+    console.log("   Building optimized production bundle...");
+    const buildResult = runCommand("npm run build 2>&1");
     if (buildResult.success) {
-      logSuccess('Production build completed');
+      logSuccess("Production build completed");
       // Extract bundle info
       const buildOutput = buildResult.output;
       const sizeMatch = buildOutput.match(/(\d+\.\d+ [A-Z]+)/g);
       if (sizeMatch) {
-        console.log(`   Bundle sizes:\n   ${sizeMatch.slice(0, 5).join('\n   ')}`);
+        console.log(
+          `   Bundle sizes:\n   ${sizeMatch.slice(0, 5).join("\n   ")}`
+        );
       }
     } else {
-      logWarning('Build had warnings - review output');
+      logWarning("Build had warnings - review output");
     }
 
     // Step 2: Test Suite Validation
-    log('Step 2', 'Running Full Test Suite (84/84 tests)...');
-    const testResult = runCommand('npm test -- --passWithNoTests 2>&1');
+    log("Step 2", "Running Full Test Suite (84/84 tests)...");
+    const testResult = runCommand("npm test -- --passWithNoTests 2>&1");
     const testOutput = testResult.output;
-    
+
     // Parse test results
     const testMatch = testOutput.match(/Tests:\s+(\d+)\s+passed/);
-    const passedTests = testMatch ? testMatch[1] : '0';
-    
+    const passedTests = testMatch ? testMatch[1] : "0";
+
     console.log(`   Tests passed: ${passedTests}/84`);
-    if (passedTests === '84') {
-      logSuccess('All 84 tests passing - no regressions');
+    if (passedTests === "84") {
+      logSuccess("All 84 tests passing - no regressions");
     } else {
       logWarning(`Only ${passedTests}/84 tests passing`);
     }
 
     // Step 3: Generate Performance Report
-    log('Step 3', 'Generating Performance Report...');
+    log("Step 3", "Generating Performance Report...");
     const report = {
       timestamp: new Date().toISOString(),
-      phase: 'Phase 3 Part 2',
-      stage: 'Performance Testing',
+      phase: "Phase 3 Part 2",
+      stage: "Performance Testing",
       results: {
         tests: {
           total: 84,
           passing: parseInt(passedTests),
           failing: 84 - parseInt(passedTests),
-          status: passedTests === '84' ? 'PASS ✅' : 'FAIL ❌'
+          status: passedTests === "84" ? "PASS ✅" : "FAIL ❌",
         },
         database: {
           indexes: 24,
-          status: 'Ready for Supabase deployment',
-          expectedImprovement: '10-100x faster queries'
+          status: "Ready for Supabase deployment",
+          expectedImprovement: "10-100x faster queries",
         },
         imageOptimization: {
           components: 8,
           tests: 24,
-          status: 'PASS ✅',
-          expectedImprovement: '30-40% LCP improvement, 50-60% size reduction'
+          status: "PASS ✅",
+          expectedImprovement: "30-40% LCP improvement, 50-60% size reduction",
         },
         codeSplitting: {
           lazyComponents: 30,
-          status: 'Configured',
-          expectedImprovement: '20-30% bundle reduction'
+          status: "Configured",
+          expectedImprovement: "20-30% bundle reduction",
         },
         performance: {
           targets: {
-            lighthouseScore: '85-90',
-            lcp: '< 2.0s',
-            fid: '< 100ms',
-            cls: '< 0.1',
-            bundleSize: '< 150KB (gzipped)',
-            dbQueryTime: '< 100ms (p95)'
+            lighthouseScore: "85-90",
+            lcp: "< 2.0s",
+            fid: "< 100ms",
+            cls: "< 0.1",
+            bundleSize: "< 150KB (gzipped)",
+            dbQueryTime: "< 100ms (p95)",
           },
-          status: 'Ready for measurement'
-        }
-      }
+          status: "Ready for measurement",
+        },
+      },
     };
 
-    const reportPath = path.join(projectRoot, 'PHASE_3_PERFORMANCE_REPORT.json');
+    const reportPath = path.join(
+      projectRoot,
+      "PHASE_3_PERFORMANCE_REPORT.json"
+    );
     fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
-    logSuccess('Performance report generated');
+    logSuccess("Performance report generated");
 
     // Step 4: Security Baseline
-    log('Step 4', 'Validating Security Baseline...');
+    log("Step 4", "Validating Security Baseline...");
     console.log(`
    Security Features Active:
    ✓ 7 Security Headers (Strict-Transport-Security, X-Frame-Options, etc.)
@@ -149,10 +154,10 @@ async function performanceTesting() {
    
    Status: 89/100 security score
 `);
-    logSuccess('Security baseline validated');
+    logSuccess("Security baseline validated");
 
     // Step 5: Deployment Readiness Checklist
-    log('Step 5', 'Deployment Readiness Assessment...');
+    log("Step 5", "Deployment Readiness Assessment...");
     console.log(`
    ✅ Code Quality
       ├─ TypeScript: 0 errors (strict mode)
@@ -186,7 +191,7 @@ async function performanceTesting() {
 `);
 
     // Step 6: Performance Metrics Targets
-    log('Step 6', 'Setting Performance Targets...');
+    log("Step 6", "Setting Performance Targets...");
     console.log(`
    Phase 3 Part 2 Success Criteria:
    
@@ -213,10 +218,10 @@ async function performanceTesting() {
    • Security Score: 89/100 ✅
    • Zero Regressions: Confirmed ✅
 `);
-    logSuccess('Performance targets established');
+    logSuccess("Performance targets established");
 
     // Step 7: Next Steps
-    log('Step 7', 'Deployment & Monitoring Plan...');
+    log("Step 7", "Deployment & Monitoring Plan...");
     console.log(`
    Immediate Actions (Next 24 hours):
    □ Execute database indexes on Supabase
@@ -247,12 +252,12 @@ async function performanceTesting() {
    □ Consider additional performance enhancements
    □ Plan Phase 4 (Advanced Features)
 `);
-    logSuccess('Deployment plan established');
+    logSuccess("Deployment plan established");
 
     // Final Summary
-    console.log('\n' + '='.repeat(70));
-    console.log('✨ PERFORMANCE TESTING COMPLETE');
-    console.log('='.repeat(70));
+    console.log("\n" + "=".repeat(70));
+    console.log("✨ PERFORMANCE TESTING COMPLETE");
+    console.log("=".repeat(70));
     console.log(`
 📊 Summary:
    ✅ Production build: Successful

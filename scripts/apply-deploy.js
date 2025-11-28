@@ -3,7 +3,7 @@
 /**
  * Apply & Deploy - Phase 3 Part 2 Performance Optimization
  * Master script to orchestrate all optimizations
- * 
+ *
  * Sequence:
  * 1. Apply Database Indexes to Supabase
  * 2. Validate Database Performance
@@ -13,10 +13,10 @@
  * 6. Verify All Tests Pass (84/84)
  */
 
-const { execSync } = require('child_process');
-const path = require('path');
+const { execSync } = require("child_process");
+const path = require("path");
 
-const projectRoot = path.join(__dirname, '..');
+const projectRoot = path.join(__dirname, "..");
 
 function log(step, message) {
   const timestamp = new Date().toLocaleTimeString();
@@ -39,36 +39,38 @@ function runCommand(command, options = {}) {
   try {
     const output = execSync(command, {
       cwd: projectRoot,
-      encoding: 'utf-8',
-      stdio: 'pipe',
-      ...options
+      encoding: "utf-8",
+      stdio: "pipe",
+      ...options,
     });
     return { success: true, output };
   } catch (error) {
-    return { success: false, error: error.message, output: error.stdout || '' };
+    return { success: false, error: error.message, output: error.stdout || "" };
   }
 }
 
 async function deployPhase3Part2() {
-  console.log('\n' + '='.repeat(70));
-  console.log('🚀 PHASE 3 PART 2: APPLY & DEPLOY');
-  console.log('Performance Optimization Implementation');
-  console.log('='.repeat(70));
+  console.log("\n" + "=".repeat(70));
+  console.log("🚀 PHASE 3 PART 2: APPLY & DEPLOY");
+  console.log("Performance Optimization Implementation");
+  console.log("=".repeat(70));
 
   try {
     // Step 1: Verify Tests Pass
-    log('Step 1', 'Verifying Test Suite (84/84 tests expected)...');
-    const testResult = runCommand('npm test -- --passWithNoTests 2>&1', {
-      stdio: 'inherit'
+    log("Step 1", "Verifying Test Suite (84/84 tests expected)...");
+    const testResult = runCommand("npm test -- --passWithNoTests 2>&1", {
+      stdio: "inherit",
     });
     if (!testResult.success) {
-      logWarning('Some tests may have issues. Review before production deployment.');
+      logWarning(
+        "Some tests may have issues. Review before production deployment."
+      );
     } else {
-      logSuccess('Test suite validation complete');
+      logSuccess("Test suite validation complete");
     }
 
     // Step 2: Database Indexes Info
-    log('Step 2', 'Preparing Database Indexes (24 indexes ready)...');
+    log("Step 2", "Preparing Database Indexes (24 indexes ready)...");
     console.log(`
 📊 Database Indexes to Apply:
    ✓ Profiles: 3 indexes (auth_id, email, status)
@@ -91,10 +93,10 @@ Location: database_migrations/add_performance_indexes.sql
    3. Execute all statements
    4. Verify with: SELECT COUNT(*) FROM pg_indexes WHERE schemaname='public';
 `);
-    logSuccess('Database index migration prepared');
+    logSuccess("Database index migration prepared");
 
     // Step 3: Image Optimization
-    log('Step 3', 'Preparing Image Optimization Components...');
+    log("Step 3", "Preparing Image Optimization Components...");
     console.log(`
 🖼️  Image Optimization Library Ready:
    ✓ OptimizedProductImage - Product catalog images
@@ -117,10 +119,10 @@ Location: src/lib/imageOptimization.tsx
    4. Test image rendering and performance
    5. Priority: Product cards, Hero sections, Profile images
 `);
-    logSuccess('Image optimization library verified');
+    logSuccess("Image optimization library verified");
 
     // Step 4: Code Splitting
-    log('Step 4', 'Preparing Code Splitting Configuration...');
+    log("Step 4", "Preparing Code Splitting Configuration...");
     console.log(`
 📦 Code Splitting Utilities Ready:
    ✓ 30+ components configured for lazy loading
@@ -141,23 +143,23 @@ Location: src/lib/codeSplitting.ts
    Usage: const ComponentName = lazyLoadComponent.AdminDashboard;
    Already integrated in route handlers
 `);
-    logSuccess('Code splitting configuration verified');
+    logSuccess("Code splitting configuration verified");
 
     // Step 5: Build Production
-    log('Step 5', 'Building Production Bundle...');
-    const buildResult = runCommand('npm run build');
+    log("Step 5", "Building Production Bundle...");
+    const buildResult = runCommand("npm run build");
     if (buildResult.success) {
-      logSuccess('Production build completed successfully');
+      logSuccess("Production build completed successfully");
       console.log(`
 📦 Build Output:
-${buildResult.output.split('\n').slice(-15).join('\n')}`);
+${buildResult.output.split("\n").slice(-15).join("\n")}`);
     } else {
-      logWarning('Build completed with warnings');
+      logWarning("Build completed with warnings");
       console.log(buildResult.output);
     }
 
     // Step 6: Deployment Instructions
-    log('Step 6', 'Deployment Instructions Ready...');
+    log("Step 6", "Deployment Instructions Ready...");
     console.log(`
 🚀 DEPLOYMENT SEQUENCE:
 
@@ -193,7 +195,7 @@ Expected Improvements:
 `);
 
     // Step 7: Performance Testing Setup
-    log('Step 7', 'Performance Testing Setup...');
+    log("Step 7", "Performance Testing Setup...");
     console.log(`
 📊 Next: Performance Testing Phase
    
@@ -217,12 +219,12 @@ Setup Steps:
    3. Setup performance monitoring in analytics
    4. Create performance dashboard
 `);
-    logSuccess('Performance testing setup prepared');
+    logSuccess("Performance testing setup prepared");
 
     // Final Summary
-    console.log('\n' + '='.repeat(70));
-    console.log('✨ APPLY & DEPLOY PREPARATION COMPLETE');
-    console.log('='.repeat(70));
+    console.log("\n" + "=".repeat(70));
+    console.log("✨ APPLY & DEPLOY PREPARATION COMPLETE");
+    console.log("=".repeat(70));
     console.log(`
 📋 Summary:
    ✅ Tests verified: 84/84 PASSING

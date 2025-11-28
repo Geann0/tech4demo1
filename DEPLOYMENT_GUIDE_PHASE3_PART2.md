@@ -5,6 +5,7 @@
 ### Step 1: Deploy Database Indexes (⏱️ 5 minutes)
 
 **What to do:**
+
 1. Go to [Supabase Dashboard](https://app.supabase.com)
 2. Navigate to **SQL Editor**
 3. Open file: `database_migrations/add_performance_indexes.sql`
@@ -13,16 +14,18 @@
 6. Wait for completion (typically < 30 seconds)
 
 **Verify:**
+
 ```sql
 -- Run this to confirm all indexes were created:
-SELECT COUNT(*) as index_count 
-FROM pg_indexes 
+SELECT COUNT(*) as index_count
+FROM pg_indexes
 WHERE schemaname='public';
 
 -- Expected result: 24+ indexes
 ```
 
 **Expected Impact:**
+
 - ⚡ Order queries: 10-20x faster
 - ⚡ Product searches: 15-30x faster
 - ⚡ User lookups: 5-10x faster
@@ -33,6 +36,7 @@ WHERE schemaname='public';
 ### Step 2: Merge Code Changes (⏱️ 10 minutes)
 
 **What to do:**
+
 1. Push current branch to GitHub
 2. Create Pull Request to `main` branch
 3. Review changes (if needed)
@@ -40,11 +44,13 @@ WHERE schemaname='public';
 5. GitHub Actions will auto-deploy
 
 **Command:**
+
 ```bash
 git push origin main
 ```
 
 **Verify:**
+
 - Check GitHub Actions tab
 - Verify build succeeds (green checkmark)
 - Monitor deployment logs
@@ -54,6 +60,7 @@ git push origin main
 ### Step 3: Update Image Components (⏱️ 30 minutes)
 
 **Priority 1 - Critical Components:**
+
 1. Product cards in catalog
 2. Product detail pages
 3. Profile avatars
@@ -63,61 +70,44 @@ git push origin main
 
 ```tsx
 // BEFORE (using Image from next/image)
-import Image from 'next/image';
+import Image from "next/image";
 
 export function ProductCard() {
   return (
-    <Image
-      src={product.image}
-      alt={product.name}
-      width={300}
-      height={300}
-    />
+    <Image src={product.image} alt={product.name} width={300} height={300} />
   );
 }
 
 // AFTER (using optimized version)
-import { OptimizedProductImage } from '@/lib/imageOptimization';
+import { OptimizedProductImage } from "@/lib/imageOptimization";
 
 export function ProductCard() {
-  return (
-    <OptimizedProductImage
-      src={product.image}
-      alt={product.name}
-    />
-  );
+  return <OptimizedProductImage src={product.image} alt={product.name} />;
 }
 ```
 
 **For hero images:**
+
 ```tsx
-import { OptimizedHeroImage } from '@/lib/imageOptimization';
+import { OptimizedHeroImage } from "@/lib/imageOptimization";
 
 export function HeroSection() {
-  return (
-    <OptimizedHeroImage
-      src="/hero.jpg"
-      alt="Hero Banner"
-    />
-  );
+  return <OptimizedHeroImage src="/hero.jpg" alt="Hero Banner" />;
 }
 ```
 
 **For profile images:**
+
 ```tsx
-import { OptimizedProfileImage } from '@/lib/imageOptimization';
+import { OptimizedProfileImage } from "@/lib/imageOptimization";
 
 export function ProfileAvatar() {
-  return (
-    <OptimizedProfileImage
-      src={user.avatar}
-      alt={user.name}
-    />
-  );
+  return <OptimizedProfileImage src={user.avatar} alt={user.name} />;
 }
 ```
 
 **Test locally:**
+
 ```bash
 npm run dev
 # Visit http://localhost:3000
@@ -130,18 +120,21 @@ npm run dev
 ### Step 4: Verification & Testing (⏱️ 15 minutes)
 
 **Run all tests:**
+
 ```bash
 npm test
 # Expected: 84/84 passing
 ```
 
 **Build production bundle:**
+
 ```bash
 npm run build
 # Expected: Success with optimized bundle
 ```
 
 **Check bundle size:**
+
 ```bash
 # If available:
 npm run analyze
@@ -149,6 +142,7 @@ npm run analyze
 ```
 
 **Run Lighthouse audit:**
+
 ```bash
 # Using Chrome DevTools (local development)
 1. Open DevTools (F12)
@@ -166,28 +160,33 @@ npm run analyze
 ## 📅 Timeline
 
 ### Phase 1: Database (Day 1 - 5 mins)
+
 - [ ] Execute indexes in Supabase
 - [ ] Verify with SQL query
 - [ ] Monitor performance metrics
 
 ### Phase 2: Code Merge (Day 1 - 10 mins)
+
 - [ ] Push to GitHub
 - [ ] Verify GitHub Actions succeeds
 - [ ] Monitor production deployment
 
 ### Phase 3: Component Updates (Day 1-2 - 30 mins per session)
+
 - [ ] Update 5-10 components per session
 - [ ] Test each session
 - [ ] Commit working changes
 - [ ] Rotate through all priority components
 
 ### Phase 4: Final Testing (Day 2 - 15 mins)
+
 - [ ] Run full test suite
 - [ ] Build production bundle
 - [ ] Lighthouse audit
 - [ ] Document results
 
 ### Phase 5: Monitoring (Week 1-2 - ongoing)
+
 - [ ] Track Web Vitals
 - [ ] Monitor database performance
 - [ ] Gather user feedback
@@ -236,27 +235,31 @@ Expected Impact: 85-90 Lighthouse score, significant gains
 
 After completing all steps, you should see:
 
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| Database Queries | 100-1000ms | 1-100ms | 10-100x ⚡ |
-| Image LCP | 3-4s | 1.5-2s | 30-40% 📸 |
-| Bundle Size | 200KB | 140KB | 20-30% 📦 |
-| Lighthouse | 70-75 | 85-90 | 15-20% 🎯 |
-| Time to Interactive | 4-5s | 3-3.5s | 20-30% ⚡ |
+| Metric              | Before     | After   | Improvement |
+| ------------------- | ---------- | ------- | ----------- |
+| Database Queries    | 100-1000ms | 1-100ms | 10-100x ⚡  |
+| Image LCP           | 3-4s       | 1.5-2s  | 30-40% 📸   |
+| Bundle Size         | 200KB      | 140KB   | 20-30% 📦   |
+| Lighthouse          | 70-75      | 85-90   | 15-20% 🎯   |
+| Time to Interactive | 4-5s       | 3-3.5s  | 20-30% ⚡   |
 
 ---
 
 ## 🐛 Troubleshooting
 
 ### Issue: Database index creation fails
+
 **Solution:**
+
 - Check Supabase connectivity
 - Verify SQL syntax in file
 - Try creating one index at a time
 - Check Supabase quota limits
 
 ### Issue: Tests fail after component updates
+
 **Solution:**
+
 ```bash
 # Clear cache and reinstall
 rm -rf .next node_modules
@@ -265,14 +268,18 @@ npm test
 ```
 
 ### Issue: Images not loading
+
 **Solution:**
+
 - Check image paths are correct
 - Verify alt text is provided
 - Check Next.js Image import is removed
 - Test in incognito mode (cache clear)
 
 ### Issue: Bundle size increased
+
 **Solution:**
+
 ```bash
 # Analyze what increased size
 npm run analyze
@@ -342,7 +349,7 @@ You'll know Phase 3 Part 2 is successful when:
 ✅ **Lighthouse**: Score 85-90/100  
 ✅ **Monitoring**: Web Vitals tracked in production  
 ✅ **Documentation**: Performance report completed  
-✅ **Zero Issues**: No regressions or bugs reported  
+✅ **Zero Issues**: No regressions or bugs reported
 
 ---
 
@@ -356,6 +363,7 @@ If you encounter issues:
    - See PHASE_3_PERFORMANCE.md for monitoring
 
 2. **Review test results:**
+
    ```bash
    npm test -- --verbose
    ```
@@ -373,12 +381,14 @@ If you encounter issues:
 ## 🎉 What's After Phase 3 Part 2?
 
 ### Phase 3 Part 3: Advanced Optimization
+
 - Service Worker caching
 - Advanced prefetching
 - Critical CSS extraction
 - Resource prioritization
 
 ### Phase 4: Feature Development
+
 - Email verification system
 - Account lockout mechanism
 - Multi-factor authentication
@@ -386,6 +396,7 @@ If you encounter issues:
 - Payment gateway optimization
 
 ### Phase 5: Scaling & Infrastructure
+
 - CDN optimization
 - Database sharding
 - Cache management
