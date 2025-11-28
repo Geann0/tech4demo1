@@ -31,11 +31,13 @@ The original migration file attempted to create an index on a column `auth_id` i
 The corrected migration creates indexes on verified columns:
 
 #### Profile Indexes (3)
+
 - `idx_profiles_user_id` - user_id foreign key
 - `idx_profiles_email` - email lookups
 - `idx_profiles_role` - role filtering
 
 #### Order Indexes (8)
+
 - `idx_orders_user_id` - user order lookup
 - `idx_orders_status` - status filtering
 - `idx_orders_created_at` - date sorting
@@ -45,6 +47,7 @@ The corrected migration creates indexes on verified columns:
 - `idx_orders_updated_at` - recent updates
 
 #### Product Indexes (9)
+
 - `idx_products_category_id` - category filtering
 - `idx_products_status` - active/inactive filtering
 - `idx_products_created_at` - date sorting
@@ -55,11 +58,13 @@ The corrected migration creates indexes on verified columns:
 - `idx_products_updated_at` - recent updates
 
 #### Cart Indexes (3)
+
 - `idx_cart_items_user_id` - user's cart
 - `idx_cart_items_active` - active items (where deleted_at IS NULL)
 - `idx_cart_items_product_id` - product lookups
 
 #### Other Indexes (10+)
+
 - Product reviews (3 indexes)
 - Payments (3 indexes)
 - Order items (2 indexes)
@@ -104,9 +109,9 @@ After applying indexes, verify they were created:
 
 ```sql
 -- Check total indexes created
-SELECT COUNT(*) as index_count 
-FROM pg_indexes 
-WHERE schemaname='public' 
+SELECT COUNT(*) as index_count
+FROM pg_indexes
+WHERE schemaname='public'
 AND indexname LIKE 'idx_%';
 
 -- Expected result: 35+ indexes
@@ -119,7 +124,7 @@ AND indexname LIKE 'idx_%'
 ORDER BY tablename, indexname;
 
 -- Check index sizes
-SELECT 
+SELECT
   tablename,
   indexname,
   pg_size_pretty(pg_relation_size(indexrelid)) as size
@@ -133,6 +138,7 @@ ORDER BY pg_relation_size(indexrelid) DESC;
 Expected improvements after index deployment:
 
 ### Query Performance
+
 - **User order lookups**: 10-20x faster
 - **Product searches**: 15-30x faster
 - **Cart operations**: 5-10x faster
@@ -145,29 +151,29 @@ Test these queries before and after indexing:
 
 ```sql
 -- Test 1: User orders (should use idx_orders_user_id)
-EXPLAIN ANALYZE 
-SELECT * FROM orders 
+EXPLAIN ANALYZE
+SELECT * FROM orders
 WHERE user_id = '00000000-0000-0000-0000-000000000001'
 ORDER BY created_at DESC;
 
 -- Test 2: Product filtering (should use idx_products_category_status)
-EXPLAIN ANALYZE 
-SELECT * FROM products 
-WHERE category_id = '00000000-0000-0000-0000-000000000001' 
+EXPLAIN ANALYZE
+SELECT * FROM products
+WHERE category_id = '00000000-0000-0000-0000-000000000001'
 AND status = 'active'
 ORDER BY created_at DESC;
 
 -- Test 3: Active cart items (should use idx_cart_items_active)
-EXPLAIN ANALYZE 
-SELECT * FROM cart_items 
-WHERE user_id = '00000000-0000-0000-0000-000000000001' 
+EXPLAIN ANALYZE
+SELECT * FROM cart_items
+WHERE user_id = '00000000-0000-0000-0000-000000000001'
 AND deleted_at IS NULL;
 
 -- Test 4: Recent orders by status (should use idx_orders_status_created_at)
-EXPLAIN ANALYZE 
-SELECT * FROM orders 
-WHERE status = 'pending' 
-ORDER BY created_at DESC 
+EXPLAIN ANALYZE
+SELECT * FROM orders
+WHERE status = 'pending'
+ORDER BY created_at DESC
 LIMIT 10;
 ```
 
@@ -176,10 +182,12 @@ LIMIT 10;
 ### What Changed from Original
 
 **Before (Incorrect):**
+
 - `CREATE INDEX idx_profiles_auth_id ON profiles(auth_id)` ❌ Column doesn't exist
 - `CREATE INDEX idx_categories_search ...` ❌ Table might not exist
 
 **After (Corrected):**
+
 - `CREATE INDEX idx_profiles_user_id ON profiles(user_id)` ✅ Correct column
 - Uses only verified table names and columns
 - Added safety checks with `IF NOT EXISTS`
@@ -188,6 +196,7 @@ LIMIT 10;
 ### Testing Applied
 
 All indexes created in corrected migration have been verified against:
+
 - Actual table structures in database migrations
 - Column names from schema definitions
 - Foreign key references
@@ -212,10 +221,11 @@ All indexes created in corrected migration have been verified against:
 If you encounter other column errors:
 
 1. Check exact table/column name in Supabase:
+
    ```sql
    -- View all columns in a table
-   SELECT column_name, data_type 
-   FROM information_schema.columns 
+   SELECT column_name, data_type
+   FROM information_schema.columns
    WHERE table_name = 'profiles';
    ```
 
