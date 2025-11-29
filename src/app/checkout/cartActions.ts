@@ -3,6 +3,7 @@
 import { MercadoPagoConfig, Preference } from "mercadopago";
 import { createClient } from "@supabase/supabase-js";
 import type { CartItem } from "@/types";
+import { generateOrderCode } from "@/lib/generateOrderCode";
 
 interface CheckoutState {
   error?: string | null;
@@ -129,9 +130,13 @@ export async function processCartCheckout(
     console.log("Total do pedido:", cart.total);
     console.log("Quantidade de itens:", cart.items.length);
 
+    const orderCode = generateOrderCode();
+    console.log("🔢 Código do pedido gerado:", orderCode);
+
     const { data: orderData, error: orderError } = await supabase
       .from("orders")
       .insert({
+        order_code: orderCode,
         partner_id: cart.items[0].partner_id || null,
         customer_name: name,
         customer_email: email,

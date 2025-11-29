@@ -7,6 +7,7 @@ import {
   parseCoverageFromRegions,
   formatCoverageErrorMessage,
 } from "@/lib/geolocation";
+import { generateOrderCode } from "@/lib/generateOrderCode";
 
 interface CheckoutState {
   error?: string | null;
@@ -128,9 +129,13 @@ export async function processCheckout(
   console.log(`✅ CEP válido e dentro da área de cobertura`);
 
   // 1. Create Order in DB
+  const orderCode = generateOrderCode();
+  console.log("🔢 Código do pedido gerado:", orderCode);
+
   const { data: orderData, error: orderError } = await supabase
     .from("orders")
     .insert({
+      order_code: orderCode,
       partner_id: partnerId,
       customer_name: name,
       customer_email: email,
