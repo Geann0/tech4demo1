@@ -1,10 +1,11 @@
 "use client";
 
-import { useFormState, useFormStatus } from "react-dom";
+import { useFormState } from "react-dom";
 import { useEffect, useState } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { toast } from "sonner";
 import {
   formatCEP,
   formatPhone,
@@ -15,9 +16,7 @@ import {
 } from "@/lib/checkoutUtils";
 import { processCartCheckout } from "@/app/checkout/cartActions";
 
-function SubmitButton({ paymentMethod }: { paymentMethod: string }) {
-  const { pending } = useFormStatus();
-
+function SubmitButton({ paymentMethod, isProcessing }: { paymentMethod: string; isProcessing: boolean }) {
   const methodLabels: Record<string, string> = {
     credit_card: "💳 Continuar para Pagamento com Cartão",
     pix: "📱 Gerar QR Code PIX",
@@ -28,10 +27,10 @@ function SubmitButton({ paymentMethod }: { paymentMethod: string }) {
   return (
     <button
       type="submit"
-      disabled={pending}
+      disabled={isProcessing}
       className="w-full flex justify-center items-center gap-2 py-4 px-6 border border-transparent rounded-xl shadow-sm text-base font-bold text-white bg-gradient-to-r from-neon-blue to-electric-purple hover:shadow-glow transition-all disabled:opacity-50 disabled:cursor-not-allowed"
     >
-      {pending ? (
+      {isProcessing ? (
         <>
           <span className="animate-spin">⏳</span>
           <span>Processando...</span>
@@ -56,6 +55,7 @@ export default function CheckoutCartForm({
   const [paymentMethod, setPaymentMethod] = useState("credit_card");
   const [saveData, setSaveData] = useState(false);
   const [cepLoading, setCepLoading] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: userEmail || "",
@@ -111,8 +111,47 @@ export default function CheckoutCartForm({
       window.location.href = state.paymentUrl;
     } else if (state.error) {
       console.error("❌ Erro no checkout:", state.error);
+      toast.error(state.error);
     }
   }, [state, saveData, formData, clearCart]);
+
+  // Handler customizado para processar e redirecionar
+  const handleCheckoutSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsProcessing(true);
+
+    try {
+      const formDataObj = new FormData(e.currentTarget);
+      
+      console.log("🔍 Iniciando processamento do checkout...");
+      
+      // Chama a server action diretamente
+      const result = await processCartCheckout(state, formDataObj);
+      
+      console.log("📦 Resultado recebido:", result);
+
+      if (result.success && result.paymentUrl) {
+        console.log("✅ URL de pagamento recebida:", result.paymentUrl);
+        
+        if (saveData) {
+          saveCheckoutData(formData);
+        }
+        clearCart();
+        
+        console.log("🚀 Redirecionando para:", result.paymentUrl);
+        // Força o redirect imediatamente
+        window.location.href = result.paymentUrl;
+      } else if (result.error) {
+        console.error("❌ Erro no checkout:", result.error);
+        toast.error(result.error);
+        setIsProcessing(false);
+      }
+    } catch (error) {
+      console.error("❌ Erro ao processar checkout:", error);
+      toast.error("Erro ao processar pagamento. Tente novamente.");
+      setIsProcessing(false);
+    }
+  };
 
   // Auto-preencher endereço com ViaCEP
   const handleCepChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -164,7 +203,7 @@ export default function CheckoutCartForm({
   ];
 
   return (
-    <form action={formAction} className="grid lg:grid-cols-3 gap-8">
+    <form onSubmit={handleCheckoutSubmit} className="grid lg:grid-cols-3 gap-8">
       {/* Coluna Esquerda - Formulário */}
       <div className="lg:col-span-2 space-y-6">
         {/* Dados Pessoais */}
@@ -461,7 +500,7 @@ export default function CheckoutCartForm({
               </div>
             </div>
 
-            <SubmitButton paymentMethod={paymentMethod} />
+            <SubmitButton paymentMethod={paymentMethod} isProcessing={isProcessing} />
           </div>
         </div>
       </div>
