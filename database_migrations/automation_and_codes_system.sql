@@ -332,31 +332,28 @@ WHERE status = 'shipped'
 -- ================================================================
 -- PARTE 5: CONFIGURAÇÃO DE CRON JOBS
 -- ================================================================
-
-/*
--- Configurar via Supabase Dashboard ou SQL:
+-- Execute estas queries manualmente via Supabase Dashboard
 
 -- 1. Auto-aprovar pedidos pagos (a cada 5 minutos)
-SELECT cron.schedule(
-  'auto-approve-paid-orders',
-  '*/5 * * * *',
-  $$SELECT * FROM auto_approve_paid_orders();$$
-);
+-- SELECT cron.schedule(
+--   'auto-approve-paid-orders',
+--   '0,5,10,15,20,25,30,35,40,45,50,55 * * * *',
+--   'SELECT * FROM auto_approve_paid_orders();'
+-- );
 
 -- 2. Gerar códigos de rastreio faltantes (todo dia às 4h)
-SELECT cron.schedule(
-  'auto-generate-tracking',
-  '0 4 * * *',
-  $$SELECT * FROM auto_generate_tracking_codes();$$
-);
+-- SELECT cron.schedule(
+--   'auto-generate-tracking',
+--   '0 4 * * *',
+--   'SELECT * FROM auto_generate_tracking_codes();'
+-- );
 
 -- 3. Gerar SKUs faltantes (todo dia às 5h)
-SELECT cron.schedule(
-  'auto-generate-skus',
-  '0 5 * * *',
-  $$SELECT * FROM auto_generate_product_skus();$$
-);
-*/
+-- SELECT cron.schedule(
+--   'auto-generate-skus',
+--   '0 5 * * *',
+--   'SELECT * FROM auto_generate_product_skus();'
+-- );
 
 -- ================================================================
 -- PARTE 6: ATUALIZAR DADOS EXISTENTES
@@ -453,46 +450,45 @@ SELECT
 -- ================================================================
 -- ROLLBACK (SE NECESSÁRIO)
 -- ================================================================
+-- Descomente estas queries se precisar desfazer a migração
 
-/*
 -- Remover cron jobs
-SELECT cron.unschedule('auto-approve-paid-orders');
-SELECT cron.unschedule('auto-generate-tracking');
-SELECT cron.unschedule('auto-generate-skus');
+-- SELECT cron.unschedule('auto-approve-paid-orders');
+-- SELECT cron.unschedule('auto-generate-tracking');
+-- SELECT cron.unschedule('auto-generate-skus');
 
 -- Remover views
-DROP VIEW IF EXISTS automation_statistics;
-DROP VIEW IF EXISTS products_without_codes;
-DROP VIEW IF EXISTS orders_pending_auto_approval;
+-- DROP VIEW IF EXISTS automation_statistics;
+-- DROP VIEW IF EXISTS products_without_codes;
+-- DROP VIEW IF EXISTS orders_pending_auto_approval;
 
 -- Remover funções
-DROP FUNCTION IF EXISTS auto_generate_product_skus();
-DROP FUNCTION IF EXISTS auto_generate_tracking_codes();
-DROP FUNCTION IF EXISTS auto_approve_paid_orders();
-DROP FUNCTION IF EXISTS set_order_code();
-DROP FUNCTION IF EXISTS generate_tracking_code();
-DROP FUNCTION IF EXISTS generate_product_sku(TEXT, TEXT);
-DROP FUNCTION IF EXISTS generate_order_code();
+-- DROP FUNCTION IF EXISTS auto_generate_product_skus();
+-- DROP FUNCTION IF EXISTS auto_generate_tracking_codes();
+-- DROP FUNCTION IF EXISTS auto_approve_paid_orders();
+-- DROP FUNCTION IF EXISTS set_order_code();
+-- DROP FUNCTION IF EXISTS generate_tracking_code();
+-- DROP FUNCTION IF EXISTS generate_product_sku(TEXT, TEXT);
+-- DROP FUNCTION IF EXISTS generate_order_code();
 
 -- Remover trigger
-DROP TRIGGER IF EXISTS trigger_set_order_code ON orders;
+-- DROP TRIGGER IF EXISTS trigger_set_order_code ON orders;
 
 -- Remover sequência
-DROP SEQUENCE IF EXISTS order_code_seq;
+-- DROP SEQUENCE IF EXISTS order_code_seq;
 
 -- Remover colunas (CUIDADO: perda de dados!)
-ALTER TABLE orders
-DROP COLUMN IF EXISTS order_code,
-DROP COLUMN IF EXISTS order_barcode,
-DROP COLUMN IF EXISTS order_qr_code,
-DROP COLUMN IF EXISTS shipping_label_url,
-DROP COLUMN IF EXISTS auto_approved,
-DROP COLUMN IF EXISTS auto_processed_at;
+-- ALTER TABLE orders
+-- DROP COLUMN IF EXISTS order_code,
+-- DROP COLUMN IF EXISTS order_barcode,
+-- DROP COLUMN IF EXISTS order_qr_code,
+-- DROP COLUMN IF EXISTS shipping_label_url,
+-- DROP COLUMN IF EXISTS auto_approved,
+-- DROP COLUMN IF EXISTS auto_processed_at;
 
-ALTER TABLE products
-DROP COLUMN IF EXISTS sku,
-DROP COLUMN IF EXISTS ean13,
-DROP COLUMN IF EXISTS barcode,
-DROP COLUMN IF EXISTS qr_code_data,
-DROP COLUMN IF EXISTS internal_code;
-*/
+-- ALTER TABLE products
+-- DROP COLUMN IF EXISTS sku,
+-- DROP COLUMN IF EXISTS ean13,
+-- DROP COLUMN IF EXISTS barcode,
+-- DROP COLUMN IF EXISTS qr_code_data,
+-- DROP COLUMN IF EXISTS internal_code;
