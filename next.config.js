@@ -30,11 +30,12 @@ const securityHeaders = [
     key: "Content-Security-Policy",
     value:
       "default-src 'self'; " +
-      "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
-      "style-src 'self' 'unsafe-inline'; " +
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://stripe.com; " +
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
       "img-src 'self' https: data:; " +
-      "font-src 'self' https:; " +
-      "connect-src 'self' https://supabase.co https://api.mercadopago.com https://viacep.com.br; " +
+      "font-src 'self' https://fonts.gstatic.com https:; " +
+      "connect-src 'self' https: ws: wss:; " +
+      "frame-src 'self' https://js.stripe.com https://hooks.stripe.com; " +
       "frame-ancestors 'none'; " +
       "base-uri 'self'; " +
       "form-action 'self';",
