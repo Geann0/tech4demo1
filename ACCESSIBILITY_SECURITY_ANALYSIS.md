@@ -7,12 +7,12 @@
 
 ## 📊 RESUMO DOS AVISOS
 
-| Tipo | Origem | Severidade | Ação |
-|------|--------|-----------|------|
-| Acessibilidade - reCAPTCHA | Mercado Pago | ⚠️ Baixa | Inerente ao MP |
-| Compatibilidade - viewport | Mercado Pago | ⚠️ Baixa | Inerente ao MP |
-| Desempenho - Cache | Mercado Pago | ⚠️ Baixa | Inerente ao MP |
-| Segurança - Headers | Mercado Pago | ⚠️ Média | Inerente ao MP |
+| Tipo                       | Origem       | Severidade | Ação           |
+| -------------------------- | ------------ | ---------- | -------------- |
+| Acessibilidade - reCAPTCHA | Mercado Pago | ⚠️ Baixa   | Inerente ao MP |
+| Compatibilidade - viewport | Mercado Pago | ⚠️ Baixa   | Inerente ao MP |
+| Desempenho - Cache         | Mercado Pago | ⚠️ Baixa   | Inerente ao MP |
+| Segurança - Headers        | Mercado Pago | ⚠️ Média   | Inerente ao MP |
 
 ---
 
@@ -26,7 +26,8 @@ Form elements must have labels: Element has no title attribute
 
 **Causa:** O reCAPTCHA do Mercado Pago não tem labels acessíveis
 
-**Realidade:** 
+**Realidade:**
+
 - ✅ Está funcionando corretamente
 - ✅ O reCAPTCHA é validado internamente pelo Google
 - ❌ Não é do seu controle
@@ -44,6 +45,7 @@ Form elements must have labels: Element has no title attribute
 **Causa:** Meta tag do Mercado Pago tem `maximum-scale=1.0`
 
 **Realidade:**
+
 - ✅ Previne zoom indesejado em formulários
 - ❌ Reduz acessibilidade para usuários com deficiência visual
 - ❌ Não é do seu controle
@@ -62,6 +64,7 @@ Response should not include unneeded headers: x-xss-protection
 **Causa:** Headers HTTP do Mercado Pago
 
 **Realidade:**
+
 - ✅ O MP gerencia seus próprios headers
 - ❌ Você não controla iframes externos
 
@@ -79,6 +82,7 @@ X-Frame-Options header usage (deprecated em favor de CSP)
 **Causa:** Configurações de segurança do Mercado Pago
 
 **Realidade:**
+
 - ✅ Mercado Pago tem suas próprias políticas de segurança
 - ✅ CSP no seu site protege contra iframes maliciosos
 - ❌ Headers internos do MP não é do seu controle
@@ -152,6 +156,7 @@ Razões:
 4. ✅ **Compatibilidade:** Funciona em todos os navegadores
 
 Estes avisos vêm do **iframe externo do Mercado Pago**, que:
+
 - Você não controla
 - Mercado Pago gerencia
 - É isolado do seu código
@@ -179,21 +184,22 @@ Seu site (`localhost:3000`) DEVE ter:
 
 const securityHeaders = [
   {
-    key: 'Content-Security-Policy',
-    value: 'frame-ancestors \'self\'; script-src \'self\' \'unsafe-inline\' https://apis.google.com https://www.mercadopago.com; style-src \'self\' \'unsafe-inline\';'
+    key: "Content-Security-Policy",
+    value:
+      "frame-ancestors 'self'; script-src 'self' 'unsafe-inline' https://apis.google.com https://www.mercadopago.com; style-src 'self' 'unsafe-inline';",
   },
   {
-    key: 'X-Content-Type-Options',
-    value: 'nosniff'
+    key: "X-Content-Type-Options",
+    value: "nosniff",
   },
   {
-    key: 'X-Frame-Options',
-    value: 'SAMEORIGIN'
+    key: "X-Frame-Options",
+    value: "SAMEORIGIN",
   },
   {
-    key: 'Cache-Control',
-    value: 'public, max-age=3600, must-revalidate'
-  }
+    key: "Cache-Control",
+    value: "public, max-age=3600, must-revalidate",
+  },
 ];
 ```
 
@@ -206,6 +212,7 @@ Seu site **JÁ TEM** isso! ✅
 **Nenhuma ação necessária.**
 
 Os avisos são do Mercado Pago sandbox:
+
 - São esperados
 - Não afetam funcionalidade
 - Não são vulnerabilidades do seu código
@@ -220,6 +227,7 @@ Se você quiser reportar estes avisos ao Mercado Pago:
 **Email:** developers@mercadopago.com
 
 **Mencione:**
+
 ```
 Sandbox Mercado Pago tem avisos de acessibilidade:
 - Form elements (reCAPTCHA) sem labels
@@ -233,13 +241,13 @@ Mercado Pago provavelmente dirá: "É esperado no sandbox. Use para testes apena
 
 ## ✨ CONCLUSÃO
 
-| Aspecto | Status | Ação |
-|---------|--------|------|
-| Seu código | ✅ Seguro | Nenhuma |
-| Acessibilidade | ✅ Boa | Nenhuma |
-| Segurança | ✅ Configurada | Nenhuma |
-| Funcionalidade | ✅ 100% | Nenhuma |
-| Avisos do MP | ⚠️ Esperados | Nenhuma |
+| Aspecto        | Status         | Ação    |
+| -------------- | -------------- | ------- |
+| Seu código     | ✅ Seguro      | Nenhuma |
+| Acessibilidade | ✅ Boa         | Nenhuma |
+| Segurança      | ✅ Configurada | Nenhuma |
+| Funcionalidade | ✅ 100%        | Nenhuma |
+| Avisos do MP   | ⚠️ Esperados   | Nenhuma |
 
 **Continue com os testes de pagamento!** 🚀
 

@@ -1,6 +1,7 @@
 # 🔧 DEBUG: Problemas com Pagamento no Mercado Pago
 
 **Problema Reportado:**
+
 ```
 ❌ "Número do cartão"
 ❌ "Não é possível continuar o pagamento com este cartão."
@@ -43,20 +44,21 @@ Email:               test@test.com
 
 ### **3️⃣ CARTÕES COM RESULTADO ESPECÍFICO**
 
-| Número | Resultado | Descrição |
-|--------|-----------|-----------|
-| `4111 1111 1111 1111` | ✅ Aprovado | Visa padrão |
-| `5500 0555 0000 0004` | ✅ Aprovado | Mastercard |
-| `4000 0000 0000 0002` | ❌ Recusado | Cartão recusado |
-| `4000 0000 0000 0069` | ❌ Vencido | Cartão vencido |
+| Número                | Resultado   | Descrição              |
+| --------------------- | ----------- | ---------------------- |
+| `4111 1111 1111 1111` | ✅ Aprovado | Visa padrão            |
+| `5500 0555 0000 0004` | ✅ Aprovado | Mastercard             |
+| `4000 0000 0000 0002` | ❌ Recusado | Cartão recusado        |
+| `4000 0000 0000 0069` | ❌ Vencido  | Cartão vencido         |
 | `5031 4333 3010 0003` | ✅ Aprovado | Mastercard alternativa |
-| `3530 1113 3330 0000` | ✅ Aprovado | JCB |
+| `3530 1113 3330 0000` | ✅ Aprovado | JCB                    |
 
 ---
 
 ## 🚨 POSSÍVEIS CAUSAS DO ERRO
 
 ### **1. Número do Cartão Inválido**
+
 - ❌ Usando número real de cartão (NUNCA em modo teste!)
 - ❌ Número com espaços ou caracteres especiais
 - ❌ Número incompleto
@@ -66,11 +68,13 @@ Email:               test@test.com
 ---
 
 ### **2. Dados do Titular Incorretos**
+
 - ❌ Campo de nome vazio
 - ❌ Nome com caracteres especiais
 - ❌ Email inválido
 
 **SOLUÇÃO:**
+
 ```
 Nome: APRO (ou João Silva)
 Email: teste@teste.com
@@ -79,10 +83,12 @@ Email: teste@teste.com
 ---
 
 ### **3. Data de Validade Expirada**
+
 - ❌ Ano 2024 ou anterior
 - ❌ Mês/ano no passado
 
 **SOLUÇÃO:**
+
 ```
 Validade: 11/2025 ou 12/2025
 ```
@@ -90,10 +96,12 @@ Validade: 11/2025 ou 12/2025
 ---
 
 ### **4. CVV/Código de Segurança Ausente**
+
 - ❌ Deixado em branco
 - ❌ Número incorreto
 
 **SOLUÇÃO:**
+
 ```
 CVV: 123 (qualquer número de 3 dígitos)
 ```
@@ -103,11 +111,13 @@ CVV: 123 (qualquer número de 3 dígitos)
 ## 📋 PASSO-A-PASSO CORRETO
 
 ### **Etapa 1: Abra a página de checkout**
+
 ```
 http://localhost:3000/checkout
 ```
 
 ### **Etapa 2: Preencha dados pessoais**
+
 ```
 Nome Completo:    João Silva
 Email:            teste@teste.com
@@ -120,11 +130,13 @@ Estado:           SP
 ```
 
 ### **Etapa 3: Selecione método de pagamento**
+
 ```
 ☑️ Cartão de Crédito (Selecionado por padrão)
 ```
 
 ### **Etapa 4: Clique "Continuar para Pagamento com Cartão"**
+
 ```
 Console esperado:
 ✅ Validação de total OK
@@ -164,6 +176,7 @@ Console esperado:
 ### **Etapa 6: Clique "Continuar" ou "Pagar"**
 
 **Esperado:**
+
 ```
 ✅ Pagamento Aprovado
 ✅ Redirecionado para /compra-sucesso
@@ -177,12 +190,14 @@ Console esperado:
 Abra o DevTools do navegador (F12 → Console) e procure por:
 
 ### **✅ Sucesso:**
+
 ```javascript
 POST /checkout 200
 ✅ Mercado Pago preference created: 692891333-xxxxx
 ```
 
 ### **❌ Erro (exemplo):**
+
 ```javascript
 POST /checkout 500
 ❌ Checkout error: Invalid payment method
@@ -232,6 +247,7 @@ POST /checkout 500
 ## 📞 Se o problema persistir
 
 **Colete estas informações:**
+
 1. Screenshot exato da mensagem de erro
 2. Output completo do console (F12)
 3. Resposta da rede (DevTools → Network → Busque "checkout")

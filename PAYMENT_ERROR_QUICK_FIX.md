@@ -1,6 +1,7 @@
 # 🚨 ERRO NO PAGAMENTO: SOLUÇÃO PRÁTICA
 
 ## Problema Reportado
+
 ```
 ❌ "Número do cartão"
 ❌ "Não é possível continuar o pagamento com este cartão."
@@ -14,6 +15,7 @@
 ### **O que você DEVE fazer:**
 
 **1. Use EXATAMENTE este cartão de teste:**
+
 ```
 Número:     4111111111111111
 Validade:   11/25 (novembro de 2025)
@@ -22,6 +24,7 @@ Titular:    APRO
 ```
 
 **2. Siga esta ordem:**
+
 1. Abra http://localhost:3000/checkout
 2. Preencha seus dados pessoais (nome, email, etc)
 3. Selecione "💳 Cartão de Crédito"
@@ -35,6 +38,7 @@ Titular:    APRO
 ## 🔴 ERRO COMUM: "Número do cartão"
 
 ### **Causa #1: Você digitou o número COM ESPAÇOS**
+
 ```
 ❌ ERRADO:  4111 1111 1111 1111 (com espaços)
 ✅ CORRETO: 4111111111111111 (sem espaços)
@@ -45,6 +49,7 @@ Titular:    APRO
 ---
 
 ### **Causa #2: A data de validade está no PASSADO**
+
 ```
 ❌ ERRADO:  11/24 (expirou em novembro de 2024)
 ✅ CORRETO: 11/25 (válido até novembro de 2025)
@@ -55,6 +60,7 @@ Titular:    APRO
 ---
 
 ### **Causa #3: CVV (código de segurança) vazio ou inválido**
+
 ```
 ❌ ERRADO:  Deixado em branco
 ❌ ERRADO:  12 (apenas 2 dígitos)
@@ -66,6 +72,7 @@ Titular:    APRO
 ---
 
 ### **Causa #4: Campo "Titular" vazio ou inválido**
+
 ```
 ❌ ERRADO:  Deixado em branco
 ❌ ERRADO:  João123Silva (com números)
@@ -102,12 +109,14 @@ Pressione `F12` no navegador e vá para a aba **Console**
 ### **Passo 2: Procure por estas mensagens**
 
 ✅ **Sucesso** (você deve ver):
+
 ```javascript
 POST /checkout 200
 ✅ Mercado Pago preference created
 ```
 
 ❌ **Erro** (você pode ver):
+
 ```javascript
 POST /checkout 500
 ❌ Erro ao processar checkout
@@ -131,12 +140,12 @@ Se vir um erro, tire screenshot das mensagens e envie para análise
 
 Se `4111111111111111` não funcionar, tente:
 
-| Cartão | Resultado | Dados |
-|--------|-----------|-------|
-| 4111111111111111 | ✅ Aprovado | 11/25 / 123 |
+| Cartão           | Resultado                | Dados       |
+| ---------------- | ------------------------ | ----------- |
+| 4111111111111111 | ✅ Aprovado              | 11/25 / 123 |
 | 5500055500000004 | ✅ Aprovado (Mastercard) | 11/25 / 123 |
 | 5031443330100003 | ✅ Aprovado (Mastercard) | 11/25 / 123 |
-| 3530111333300000 | ✅ Aprovado (JCB) | 11/25 / 123 |
+| 3530111333300000 | ✅ Aprovado (JCB)        | 11/25 / 123 |
 
 ---
 

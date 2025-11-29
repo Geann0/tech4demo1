@@ -31,6 +31,7 @@
 ## 🧪 TESTE COMPLETO DE PAGAMENTO (PASSO A PASSO)
 
 ### **PASSO 1: Ir para Página de Produtos**
+
 ```
 URL: http://localhost:3000/produtos
 Esperado: Lista de produtos com estilos
@@ -40,6 +41,7 @@ Status: ✅ ABERTA
 ---
 
 ### **PASSO 2: Selecionar um Produto**
+
 1. Clique em qualquer produto (ex: "Intercomunicador Y10")
 2. Você será levado para a página de detalhe do produto
 3. Esperado: Imagem do produto, preço, descrição, botão "Adicionar ao Carrinho"
@@ -47,6 +49,7 @@ Status: ✅ ABERTA
 ---
 
 ### **PASSO 3: Adicionar ao Carrinho**
+
 1. Clique em "Adicionar ao Carrinho"
 2. Esperado: Notificação dizendo "Produto adicionado ao carrinho" ✅
 3. Pode adicionar mais produtos se desejar
@@ -54,6 +57,7 @@ Status: ✅ ABERTA
 ---
 
 ### **PASSO 4: Ir para o Carrinho**
+
 1. Clique em "Ir para Carrinho"
 2. OU vá direto para: http://localhost:3000/carrinho
 3. Esperado: Ver lista de itens do carrinho com:
@@ -66,6 +70,7 @@ Status: ✅ ABERTA
 ---
 
 ### **PASSO 5: Iniciar Checkout**
+
 1. Clique em "Continuar com Checkout"
 2. OU vá direto para: http://localhost:3000/checkout
 3. Esperado: Formulário de dados do cliente
@@ -73,6 +78,7 @@ Status: ✅ ABERTA
 ---
 
 ### **PASSO 6: Preencher Dados do Cliente**
+
 Preencha os seguintes campos:
 
 ```
@@ -87,6 +93,7 @@ Estado: SP
 ```
 
 **Console esperado:**
+
 ```
 ✅ Validação de total OK
 🔍 Verificando estoque
@@ -103,6 +110,7 @@ Estado: SP
 ---
 
 ### **PASSO 7: Finalizar Compra**
+
 1. Clique em "Finalizar Compra"
 2. Esperado: Redirecionado para página de pagamento do Mercado Pago
 3. Você verá formulário de pagamento com os itens
@@ -123,6 +131,7 @@ Email: seu-email@test.com
 ```
 
 **Cartões de Teste Alternativos:**
+
 - ✅ Aprovado: 4111 1111 1111 1111
 - ✅ Aprovado (Mastercard): 5500 0555 0000 0004
 - ❌ Recusado: 4000 0000 0000 0002
@@ -131,12 +140,14 @@ Email: seu-email@test.com
 ---
 
 ### **PASSO 9: Confirmar Pagamento**
+
 1. Clique em "Pagar" ou "Confirmar"
 2. Esperado: Mensagem "Pagamento Aprovado" ✅
 
 ---
 
 ### **PASSO 10: Verificar Confirmação**
+
 1. Você será redirecionado para página de sucesso
 2. Esperado:
    - ✅ Número do pedido (order_code)
@@ -150,6 +161,7 @@ Email: seu-email@test.com
 Após o pagamento, abra https://app.supabase.com e verifique:
 
 ### **Tabela: orders**
+
 ```sql
 SELECT id, order_code, payment_status, status, total_amount
 FROM orders
@@ -159,6 +171,7 @@ LIMIT 1;
 ```
 
 **Esperado:**
+
 ```
 id: uuid
 order_code: ORD-2025-XXXXX ✅
@@ -168,6 +181,7 @@ total_amount: 119.70
 ```
 
 ### **Tabela: order_items**
+
 ```sql
 SELECT id, order_id, product_id, quantity, price_at_purchase, partner_amount, platform_fee
 FROM order_items
@@ -176,6 +190,7 @@ LIMIT 1;
 ```
 
 **Esperado:**
+
 ```
 quantity: 1 (ou mais) ✅
 price_at_purchase: 119.70 ✅
@@ -205,24 +220,32 @@ platform_fee: 8.98 (119.70 × 0.075) ✅
 ## ⚠️ ERROS COMUNS E SOLUÇÕES
 
 ### **Problema: Estilos não aparecem**
+
 **Solução:**
+
 - Limpar cache: F12 → Application → Clear storage
 - Limpar cache local: `rm -r .next`
 - Reiniciar: `npm run dev`
 
 ### **Problema: Imagens não carregam**
+
 **Solução:**
+
 - Verificar Supabase Storage (deve permitir acesso público)
 - Verificar URL da imagem no console (F12)
 
 ### **Problema: Cartão recusado no Mercado Pago**
+
 **Solução:**
+
 - Usar cartão de teste: 4111 1111 1111 1111
 - Verificar data de validade (12/25 ou 12/2025)
 - Verificar CVV (123 qualquer número)
 
 ### **Problema: Pedido não aparece no Supabase**
+
 **Solução:**
+
 - Verificar console para erro (F12)
 - Verificar se RLS policies estão corretas
 - Verificar se tabela `order_items` existe
@@ -252,11 +275,13 @@ FLUXO ESPERADO:
 Após completar todos os passos, você deve ter:
 
 ✅ **Pedido no banco:**
+
 - order_code: ORD-2025-XXXXX
 - payment_status: approved
 - status: processing
 
 ✅ **Itens do pedido:**
+
 - quantity: preenchido
 - price_at_purchase: preenchido
 - partner_amount: preenchido (92.5%)
@@ -271,6 +296,7 @@ Após completar todos os passos, você deve ter:
 ## 🚀 PRÓXIMOS PASSOS
 
 Se tudo funcionar:
+
 1. Executar migração: `automation_and_codes_system.sql` no Supabase
 2. Testar múltiplos pedidos (SKU, tracking codes automáticos)
 3. Deploy para Vercel

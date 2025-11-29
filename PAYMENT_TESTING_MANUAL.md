@@ -15,6 +15,7 @@ Test-NetConnection localhost -Port 3000
 ```
 
 **Esperado:**
+
 ```
 TcpTestSucceeded : True
 ```
@@ -81,6 +82,7 @@ Marque: **☑️ 💳 Cartão de Crédito**
 Clique em: **"💳 Continuar para Pagamento com Cartão"**
 
 **Esperado no console do servidor:**
+
 ```
 ✅ Validação de total OK
 🔍 Verificando estoque
@@ -104,6 +106,7 @@ Pressione: **F12** (ou Ctrl+Shift+I)
 Vá para aba: **Console**
 
 Procure por erros vermelhos. Se houver, anote:
+
 - Mensagem exata de erro
 - Arquivo/linha onde ocorre
 - Stack trace completo
@@ -136,18 +139,21 @@ Nome do Titular:     APRO
 Quando você preenche os dados e clica em "Continuar" ou "Pagar", há 3 cenários possíveis:
 
 ### **Cenário A: ✅ SUCESSO**
+
 ```
 Página redireciona para: http://localhost:3000/compra-sucesso
 Mensagem exibida: "Pagamento Aprovado"
 ```
 
 ### **Cenário B: ❌ ERRO "Cartão Recusado"**
+
 ```
 Mensagem: "Não é possível continuar o pagamento com este cartão"
 Ou: "Cartão recusado pelo banco"
 ```
 
 ### **Cenário C: ❌ ERRO DE CARREGAMENTO**
+
 ```
 Página branca
 Ou: "Erro ao carregar página de pagamento"
@@ -160,12 +166,15 @@ Ou: "Erro ao carregar página de pagamento"
 Se você receber ERRO, captura estas informações:
 
 ### **1. Screenshot da Mensagem de Erro**
+
 Salve uma imagem exata da mensagem
 
 ### **2. Console (F12)**
+
 Clique direito no console → Select All → Copy
 
 ### **3. Network Tab (F12)**
+
 1. Clique em aba "Network"
 2. Recarregue a página (F5)
 3. Procure por uma requisição chamada "checkout" ou "preferences"
@@ -174,6 +183,7 @@ Clique direito no console → Select All → Copy
 6. Copie a resposta JSON inteira
 
 ### **4. URL Atual**
+
 Copie a URL completa da barra de endereços
 
 ---
@@ -197,16 +207,16 @@ Antes de reportar qualquer erro, verifique:
 
 ## 🚨 POSSÍVEIS RAZÕES DO ERRO
 
-| Razão | Solução |
-|-------|---------|
-| Cartão com espaços | Remova espaços: `4111111111111111` |
-| Validade expirada | Use `11/25` ou `12/25` |
-| CVV ausente | Digite `123` |
-| Titular vazio | Digite `APRO` |
-| HTTPS bloqueado | Deve ser `http://localhost:3000` (não https) |
-| Cache do navegador | Limpe: Ctrl+Shift+Delete |
-| Modo incógnito | Tente modo normal |
-| Outra aba pagando | Feche outras abas |
+| Razão              | Solução                                      |
+| ------------------ | -------------------------------------------- |
+| Cartão com espaços | Remova espaços: `4111111111111111`           |
+| Validade expirada  | Use `11/25` ou `12/25`                       |
+| CVV ausente        | Digite `123`                                 |
+| Titular vazio      | Digite `APRO`                                |
+| HTTPS bloqueado    | Deve ser `http://localhost:3000` (não https) |
+| Cache do navegador | Limpe: Ctrl+Shift+Delete                     |
+| Modo incógnito     | Tente modo normal                            |
+| Outra aba pagando  | Feche outras abas                            |
 
 ---
 

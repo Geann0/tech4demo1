@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+/* eslint-disable */
+// cSpell:disable
 /**
  * Script de Teste: Validar Integração Mercado Pago
  * Uso: node scripts/test-mercadopago.js

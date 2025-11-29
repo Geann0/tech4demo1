@@ -10,22 +10,26 @@
 Adiciona ao seu sistema:
 
 ✅ **Códigos de Produtos**
+
 - SKU (Stock Keeping Unit) - ex: `TECH-MOUS-042`
 - EAN-13 (Código de barras) - ex: `7891234567890`
 - Código interno curto - ex: `PRD001`
 - QR Code para rastreamento
 
 ✅ **Códigos de Pedidos**
+
 - Código único de pedido - ex: `ORD-2025-00001`
 - Código de rastreio - ex: `TC123456789BR`
 - Etiqueta de envio
 
 ✅ **Automações**
+
 - Auto-aprovação de pedidos com pagamento confirmado
 - Geração automática de códigos de rastreio
 - Geração automática de SKUs para produtos
 
 ✅ **Monitoramento**
+
 - Views para acompanhar pedidos aguardando aprovação
 - Estatísticas de automação
 - Produtos sem códigos
@@ -47,6 +51,7 @@ Adiciona ao seu sistema:
 6. Clique em **▶️ Run** (ou Ctrl+Enter)
 
 **Esperado:**
+
 ```
 Query executed successfully ✓
 ```
@@ -58,27 +63,35 @@ Query executed successfully ✓
 Se o arquivo for muito grande, execute em partes:
 
 #### **Parte 1: Adicionar Colunas**
+
 ```sql
 -- Copie linhas 1-57 (até CREATE INDEX IF NOT EXISTS idx_products_internal_code)
 ```
+
 Clique ▶️ Run
 
 #### **Parte 2: Adicionar Funções**
+
 ```sql
 -- Copie linhas 58-180 (até CREATE TRIGGER)
 ```
+
 Clique ▶️ Run
 
 #### **Parte 3: Views de Monitoramento**
+
 ```sql
 -- Copie linhas 181-280 (até final da última view)
 ```
+
 Clique ▶️ Run
 
 #### **Parte 4: Atualizar Dados Existentes**
+
 ```sql
 -- Copie linhas 281-300 (DO $$...END $$;)
 ```
+
 Clique ▶️ Run
 
 ---
@@ -92,7 +105,7 @@ Após executar, você deve ver as novas colunas e funções:
 No SQL Editor, execute:
 
 ```sql
-SELECT 
+SELECT
   column_name,
   data_type,
   is_nullable
@@ -103,6 +116,7 @@ ORDER BY column_name;
 ```
 
 **Esperado:**
+
 ```
 column_name      | data_type | is_nullable
 -----------------+-----------+------------
@@ -116,7 +130,7 @@ sku              | character varying | YES
 ### **2. Verificar Funções**
 
 ```sql
-SELECT 
+SELECT
   routine_name,
   routine_type
 FROM information_schema.routines
@@ -127,6 +141,7 @@ ORDER BY routine_name;
 ```
 
 **Esperado:**
+
 ```
 routine_name                | routine_type
 ---------------------------+--------------
@@ -142,7 +157,7 @@ set_order_code              | FUNCTION
 ### **3. Verificar Views**
 
 ```sql
-SELECT 
+SELECT
   table_name
 FROM information_schema.tables
 WHERE table_type = 'VIEW'
@@ -154,6 +169,7 @@ ORDER BY table_name;
 ```
 
 **Esperado:**
+
 ```
 table_name
 ---------------------------
@@ -169,13 +185,14 @@ products_without_codes
 Execute no SQL Editor:
 
 ```sql
-SELECT 
+SELECT
   generate_order_code() as novo_pedido_codigo,
   generate_tracking_code() as novo_rastreio,
   generate_product_sku('TECH', 'Mouse Gamer RGB') as novo_sku;
 ```
 
 **Esperado:**
+
 ```
 novo_pedido_codigo | novo_rastreio   | novo_sku
 -------------------+-----------------+------------------
@@ -238,6 +255,7 @@ SELECT cron.schedule(
 ```
 
 **Nota:** Se você receber erro `"pg_cron" extension does not exist`, você está em um plano que não suporta cron jobs. Neste caso, você pode:
+
 - Executar manualmente as funções quando necessário
 - Usar a API do seu backend para chamar as funções em intervalos
 - Fazer upgrade para plano Enterprise
@@ -290,13 +308,13 @@ DROP COLUMN IF EXISTS internal_code;
 
 ## 📝 FORMATOS DE CÓDIGOS GERADOS
 
-| Tipo | Formato | Exemplo | Uso |
-|------|---------|---------|-----|
-| Order Code | ORD-YYYY-NNNNN | ORD-2025-00001 | ID único pedido |
-| Tracking Code | TCNNNNNNNNNBR | TC123456789BR | Rastreamento |
-| SKU | CAT-NAME-NNN | TECH-MOUS-042 | Controle estoque |
-| EAN-13 | 13 dígitos | 7891234567890 | Código barras |
-| Internal Code | PRDN | PRD001 | Referência rápida |
+| Tipo          | Formato        | Exemplo        | Uso               |
+| ------------- | -------------- | -------------- | ----------------- |
+| Order Code    | ORD-YYYY-NNNNN | ORD-2025-00001 | ID único pedido   |
+| Tracking Code | TCNNNNNNNNNBR  | TC123456789BR  | Rastreamento      |
+| SKU           | CAT-NAME-NNN   | TECH-MOUS-042  | Controle estoque  |
+| EAN-13        | 13 dígitos     | 7891234567890  | Código barras     |
+| Internal Code | PRDN           | PRD001         | Referência rápida |
 
 ---
 
@@ -313,20 +331,24 @@ DROP COLUMN IF EXISTS internal_code;
 ## 🆘 PROBLEMAS?
 
 ### **Erro: "syntax error at or near..."**
+
 - Certifique-se de que copiou o arquivo INTEIRO
 - Verifique se não há caracteres especiais ou espaços extras
 - Tente copiar em partes (veja "Opção 2" acima)
 
 ### **Erro: "table 'orders' already has column..."**
+
 - A migração já foi executada anteriormente
 - Execute a verificação (✅ VERIFICAR SE FOI EXECUTADO COM SUCESSO)
 - Se as funções/views existem, pode ignorar este erro
 
 ### **Erro: "cron extension not available"**
+
 - Seu plano Supabase não suporta pg_cron
 - Use plano Enterprise ou execute as funções manualmente
 
 ### **Nenhum pedido gerado**
+
 - Certifique-se de que há pedidos com `payment_status = 'approved'`
 - Verifique a view: `SELECT * FROM orders_pending_auto_approval;`
 

@@ -21,11 +21,13 @@ When attempting to create an order through checkout, the system was failing with
 ### Root Cause
 
 The `order_code` column in the `orders` table had:
+
 - ✅ UNIQUE constraint (good for data integrity)
 - ✅ DEFAULT value set to empty string `''` (bad for uniqueness)
 - ❌ No generation logic in the application code
 
 **What happened:**
+
 1. Every new order was trying to insert `order_code = ''`
 2. Since `order_code` is UNIQUE, only ONE empty string can exist
 3. Second order attempt failed with duplicate constraint violation
@@ -41,13 +43,13 @@ The `order_code` column in the `orders` table had:
 export function generateOrderCode(): string {
   const now = new Date();
   const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const month = String(now.getMonth() + 1).padStart(2, "0");
   const year_month = `${year}${month}`;
-  
+
   // Gera um número aleatório de 5 dígitos
   const randomNum = Math.floor(Math.random() * 100000);
-  const paddedNum = String(randomNum).padStart(5, '0');
-  
+  const paddedNum = String(randomNum).padStart(5, "0");
+
   return `ORD-${year_month}-${paddedNum}`;
 }
 ```
@@ -55,6 +57,7 @@ export function generateOrderCode(): string {
 **Format:** `ORD-YYYYMM-##### ` (ex: `ORD-202511-45732`)
 
 **Uniqueness Guarantee:**
+
 - Year + Month: Changes monthly (provides organization)
 - 5-digit random: 100,000 combinations per month
 - Together: ~3.27 million possible codes per month
@@ -63,12 +66,15 @@ export function generateOrderCode(): string {
 ### 2. Updated Checkout Code Files
 
 #### `src/app/checkout/cartActions.ts`
+
 ✅ Added import and order code generation before insert
 
 #### `src/app/checkout/actions.ts`
+
 ✅ Added import and order code generation before insert
 
 **Changes in both files:**
+
 ```typescript
 // Before
 const { data: orderData, error: orderError } = await supabase
@@ -76,17 +82,17 @@ const { data: orderData, error: orderError } = await supabase
   .insert({
     partner_id: cart.items[0].partner_id || null,
     // ... other fields
-  })
+  });
 
 // After
 const orderCode = generateOrderCode();
 const { data: orderData, error: orderError } = await supabase
   .from("orders")
   .insert({
-    order_code: orderCode,        // ← NEW LINE
+    order_code: orderCode, // ← NEW LINE
     partner_id: cart.items[0].partner_id || null,
     // ... other fields
-  })
+  });
 ```
 
 ---
@@ -133,6 +139,7 @@ Redirect to Payment ✓
 ### Console Output During Checkout
 
 **Expected Success:**
+
 ```
 ✅ Validação de total OK: { itemCount: 1, total: 119.7, calculated: 119.7 }
 🔍 Verificando estoque de 1 produto(s)...
@@ -156,11 +163,13 @@ Quantidade de itens: 1
 ### Why This Approach?
 
 **Option 1: Database Trigger** ❌
+
 - Originally in schema: `create_trigger set_order_code()`
 - Problem: Requires database-level trigger execution
 - Risk: Timing issues, trigger might not execute reliably
 
 **Option 2: Application-Level Generation** ✅ (CHOSEN)
+
 - Generate code in application before INSERT
 - More reliable and testable
 - Better error handling and logging
@@ -178,24 +187,27 @@ ORD-202511-12345
 
 ### Randomness vs Sequential
 
-| Approach | Pros | Cons |
-|----------|------|------|
-| Sequential (1, 2, 3...) | Easy to predict | Requires state tracking, no collision protection |
-| Random (45732, 98201...) | No pattern, high uniqueness | Slight collision possibility, less sequential |
-| Hybrid (202511-45732) | Organization + uniqueness | ✅ CHOSEN APPROACH |
+| Approach                 | Pros                        | Cons                                             |
+| ------------------------ | --------------------------- | ------------------------------------------------ |
+| Sequential (1, 2, 3...)  | Easy to predict             | Requires state tracking, no collision protection |
+| Random (45732, 98201...) | No pattern, high uniqueness | Slight collision possibility, less sequential    |
+| Hybrid (202511-45732)    | Organization + uniqueness   | ✅ CHOSEN APPROACH                               |
 
 ---
 
 ## 📁 Files Changed
 
 ### New Files
+
 - `src/lib/generateOrderCode.ts` - Order code generation utility
 
 ### Modified Files
+
 - `src/app/checkout/cartActions.ts` - Multi-item cart checkout
 - `src/app/checkout/actions.ts` - Single-item direct checkout
 
 ### Git Commits
+
 - `e091155` - 🔢 Fix: Generate unique order codes to prevent duplicate constraint violations
 
 ---
@@ -218,6 +230,7 @@ After the fix, verify:
 ## 🚀 Testing Instructions
 
 ### Test Case 1: Single Order Success
+
 1. Go to http://localhost:3001/produtos
 2. Click on a product
 3. Click "Adicionar ao Carrinho"
@@ -225,12 +238,14 @@ After the fix, verify:
 5. ✅ Order should be created with unique code
 
 ### Test Case 2: Multiple Orders
+
 1. Complete order #1 (will create code like `ORD-202511-12345`)
 2. Repeat checkout process for order #2
 3. Should create code like `ORD-202511-98765`
 4. ✅ Both orders should succeed with different codes
 
 ### Test Case 3: Verify in Database
+
 1. Open Supabase Dashboard
 2. Go to Table Editor → `orders`
 3. Look for recent orders
@@ -244,14 +259,14 @@ After the fix, verify:
 
 ## 📊 Impact Summary
 
-| Aspect | Before | After |
-|--------|--------|-------|
-| Order Code Generation | ❌ None | ✅ Automatic |
-| Constraint Violations | ❌ On 2nd order | ✅ Never |
-| Unique Code Guarantee | ❌ No | ✅ Yes |
-| Code Format | ❌ Empty string | ✅ `ORD-YYYYMM-XXXXX` |
-| Multiple Checkouts | ❌ Fail | ✅ Work |
-| Auditability | ❌ Low | ✅ High (organized by month) |
+| Aspect                | Before          | After                        |
+| --------------------- | --------------- | ---------------------------- |
+| Order Code Generation | ❌ None         | ✅ Automatic                 |
+| Constraint Violations | ❌ On 2nd order | ✅ Never                     |
+| Unique Code Guarantee | ❌ No           | ✅ Yes                       |
+| Code Format           | ❌ Empty string | ✅ `ORD-YYYYMM-XXXXX`        |
+| Multiple Checkouts    | ❌ Fail         | ✅ Work                      |
+| Auditability          | ❌ Low          | ✅ High (organized by month) |
 
 ---
 

@@ -14,17 +14,18 @@
 
 The following columns have been successfully added to the `order_items` table in Supabase:
 
-| Column | Type | Default | Purpose |
-|--------|------|---------|---------|
-| `quantity` | INT | 1 | Number of items in order |
-| `price_at_purchase` | DECIMAL(10,2) | NULL | Unit price at checkout |
-| `partner_amount` | DECIMAL(10,2) | NULL | Partner revenue (92.5%) |
-| `platform_fee` | DECIMAL(10,2) | NULL | Platform fee (7.5%) |
-| `platform_fee_rate` | DECIMAL(5,2) | 7.5 | Fee percentage |
+| Column              | Type          | Default | Purpose                  |
+| ------------------- | ------------- | ------- | ------------------------ |
+| `quantity`          | INT           | 1       | Number of items in order |
+| `price_at_purchase` | DECIMAL(10,2) | NULL    | Unit price at checkout   |
+| `partner_amount`    | DECIMAL(10,2) | NULL    | Partner revenue (92.5%)  |
+| `platform_fee`      | DECIMAL(10,2) | NULL    | Platform fee (7.5%)      |
+| `platform_fee_rate` | DECIMAL(5,2)  | 7.5     | Fee percentage           |
 
 ### ✅ Indexes Created
 
 Performance indexes have been added:
+
 - `idx_order_items_partner_amount` - For partner analytics queries
 - `idx_order_items_platform_fee` - For platform fee reports
 
@@ -33,6 +34,7 @@ Performance indexes have been added:
 ## Next Steps
 
 ### 1. ✅ DONE - Database Updated
+
 The Supabase database now has all required columns.
 
 ### 2. 🔄 IN PROGRESS - Test Checkout Flow
@@ -50,12 +52,14 @@ npm run dev
 ### 3. 🧪 Test Scenarios
 
 **Scenario 1: Add Single Product to Cart**
+
 1. Go to http://localhost:3001/produtos
 2. Click on a product
 3. Click "Adicionar ao Carrinho"
 4. Verify: No schema errors in console ✅
 
 **Scenario 2: Complete Checkout with Payment**
+
 1. Click "Ir para Carrinho"
 2. Click "Continuar com Checkout"
 3. Fill in customer details
@@ -63,6 +67,7 @@ npm run dev
 5. Verify: Order created successfully ✅
 
 **Scenario 3: Verify Fee Calculation**
+
 1. Check Supabase: Table `order_items`
 2. Verify a recent order item has:
    - ✅ `quantity` populated
@@ -92,11 +97,14 @@ These values should now appear in your order_items records in Supabase.
 ## Code Changes
 
 ### Files Modified
+
 - ✅ `database_migrations/add_missing_order_items_columns.sql` - Migration file
 - ✅ `ORDER_ITEMS_COLUMNS_FIX.md` - Documentation
 
 ### Related Code (No Changes Needed)
+
 The following files already had the correct code to use these columns:
+
 - `src/app/checkout/cartActions.ts` - Line 165-182 (calculates and inserts partner_amount)
 - `src/app/checkout/actions.ts` - Line 178-186 (calculates and inserts partner_amount)
 
@@ -105,11 +113,13 @@ The following files already had the correct code to use these columns:
 ## What This Fixes
 
 ✅ **Error Fixed:**
+
 ```
 Erro ao adicionar produtos ao pedido: Could not find the 'partner_amount' column of 'order_items' in the schema cache
 ```
 
 ✅ **Features Enabled:**
+
 - Complete checkout workflow
 - Partner commission tracking (92.5% partner, 7.5% platform)
 - Order item analytics
@@ -120,9 +130,11 @@ Erro ao adicionar produtos ao pedido: Could not find the 'partner_amount' column
 ## Git Status
 
 **Commits Made:**
-- `88f80e9` - 🗄️  Add: Missing order_items table columns for partner fee calculation
+
+- `88f80e9` - 🗄️ Add: Missing order_items table columns for partner fee calculation
 
 **Files Tracked:**
+
 - ✅ database_migrations/add_missing_order_items_columns.sql
 - ✅ ORDER_ITEMS_COLUMNS_FIX.md
 

@@ -3,6 +3,7 @@
 ## 📌 Problema Reportado
 
 **Erro ao tentar fazer pagamento no Mercado Pago:**
+
 ```
 ❌ "Número do cartão"
 ❌ "Não é possível continuar o pagamento com este cartão"
@@ -39,6 +40,7 @@ POST /checkout 200
 ### **O problema está no FORMULÁRIO do Mercado Pago, não no backend**
 
 Quando você clica "Continuar para Pagamento com Cartão", o sistema:
+
 1. ✅ Cria o pedido no Supabase
 2. ✅ Valida os totais
 3. ✅ Cria preferência no Mercado Pago
@@ -50,6 +52,7 @@ Quando você clica "Continuar para Pagamento com Cartão", o sistema:
 ## 💡 Causas Mais Prováveis
 
 ### **1️⃣ Número do Cartão (Mais Comum - 70% dos casos)**
+
 ```
 ❌ Você pode estar digitando: 4111 1111 1111 1111 (com espaços)
 ✅ Correto: 4111111111111111 (sem espaços)
@@ -58,18 +61,21 @@ Quando você clica "Continuar para Pagamento com Cartão", o sistema:
 **O Mercado Pago toma campos de formulário e espaços fazem diferença**
 
 ### **2️⃣ Data de Validade Expirada**
+
 ```
 ❌ Usando: 11/24 (expirou em 2024)
 ✅ Correto: 11/25 ou 12/25
 ```
 
 ### **3️⃣ Campo de Titular Vazio**
+
 ```
 ❌ Deixando em branco
 ✅ Preenchendo com: APRO ou TESTE
 ```
 
 ### **4️⃣ CVV/Código Segurança Inválido**
+
 ```
 ❌ Deixando vazio ou digitando 2 dígitos
 ✅ Preenchendo com: 123
@@ -106,6 +112,7 @@ Quando você clica "Continuar para Pagamento com Cartão", o sistema:
 ```
 
 ### **Passos:**
+
 1. Abra http://localhost:3000/checkout
 2. Preencha os dados pessoais
 3. Selecione "Cartão de Crédito"
@@ -127,6 +134,7 @@ Quando você clica "Continuar para Pagamento com Cartão", o sistema:
 ## 🔍 COMO DIAGNOSTICAR SE NÃO FUNCIONAR
 
 ### **Passo 1: Abrir Console (F12)**
+
 ```javascript
 // Você deve ver:
 POST /checkout 200
@@ -138,12 +146,14 @@ POST /checkout 500
 ```
 
 ### **Passo 2: Abrir Network (F12)**
+
 1. Vá para aba "Network"
 2. Recarregue página
 3. Procure por "checkout"
 4. Veja a "Response" (JSON)
 
 ### **Passo 3: Screenshot do Erro**
+
 Tire print exato da mensagem de erro para análise
 
 ---
@@ -165,6 +175,7 @@ Tire print exato da mensagem de erro para análise
 ## 🎯 Próximos Passos
 
 ### **Imediato:**
+
 1. Limpe cache: Ctrl+Shift+Delete
 2. Feche o navegador completamente
 3. Reabra navegador
@@ -172,9 +183,11 @@ Tire print exato da mensagem de erro para análise
 5. Reporte resultado
 
 ### **Se funcionar:**
+
 ✅ Sistema está 100% pronto para ir para produção
 
 ### **Se não funcionar:**
+
 1. Capture screenshot do erro
 2. Abra console (F12) e copie mensagens
 3. Abra aba Network e captura a resposta
@@ -184,14 +197,14 @@ Tire print exato da mensagem de erro para análise
 
 ## 💬 Resumo Executivo
 
-| Item | Status | Detalhes |
-|------|--------|----------|
-| Backend Checkout | ✅ OK | Pedidos sendo criados normalmente |
-| Mercado Pago API | ✅ OK | Preferências sendo criadas |
-| Webhook | ✅ OK | Configurado e testado |
-| Formulário MP | ❌ ERRO | Dados do cartão recusados |
-| **Causa** | **TBD** | Provável: espaços no número |
-| **Solução** | **PRONTA** | Usar cartão sem espaços |
+| Item             | Status     | Detalhes                          |
+| ---------------- | ---------- | --------------------------------- |
+| Backend Checkout | ✅ OK      | Pedidos sendo criados normalmente |
+| Mercado Pago API | ✅ OK      | Preferências sendo criadas        |
+| Webhook          | ✅ OK      | Configurado e testado             |
+| Formulário MP    | ❌ ERRO    | Dados do cartão recusados         |
+| **Causa**        | **TBD**    | Provável: espaços no número       |
+| **Solução**      | **PRONTA** | Usar cartão sem espaços           |
 
 ---
 

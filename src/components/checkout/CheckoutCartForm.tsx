@@ -16,7 +16,13 @@ import {
 } from "@/lib/checkoutUtils";
 import { processCartCheckout } from "@/app/checkout/cartActions";
 
-function SubmitButton({ paymentMethod, isProcessing }: { paymentMethod: string; isProcessing: boolean }) {
+function SubmitButton({
+  paymentMethod,
+  isProcessing,
+}: {
+  paymentMethod: string;
+  isProcessing: boolean;
+}) {
   const methodLabels: Record<string, string> = {
     credit_card: "💳 Continuar para Pagamento com Cartão",
     pix: "📱 Gerar QR Code PIX",
@@ -122,22 +128,22 @@ export default function CheckoutCartForm({
 
     try {
       const formDataObj = new FormData(e.currentTarget);
-      
+
       console.log("🔍 Iniciando processamento do checkout...");
-      
+
       // Chama a server action diretamente
       const result = await processCartCheckout(state, formDataObj);
-      
+
       console.log("📦 Resultado recebido:", result);
 
       if (result.success && result.paymentUrl) {
         console.log("✅ URL de pagamento recebida:", result.paymentUrl);
-        
+
         if (saveData) {
           saveCheckoutData(formData);
         }
         clearCart();
-        
+
         console.log("🚀 Redirecionando para:", result.paymentUrl);
         // Força o redirect imediatamente
         window.location.href = result.paymentUrl;
@@ -500,7 +506,10 @@ export default function CheckoutCartForm({
               </div>
             </div>
 
-            <SubmitButton paymentMethod={paymentMethod} isProcessing={isProcessing} />
+            <SubmitButton
+              paymentMethod={paymentMethod}
+              isProcessing={isProcessing}
+            />
           </div>
         </div>
       </div>

@@ -318,14 +318,11 @@ export async function processCartCheckout(
         failure: `${siteUrl}/compra-falha`,
         pending: `${siteUrl}/conta/compras`,
       },
+      auto_return: "approved",
       external_reference: orderData.id,
       notification_url: `${siteUrl}/api/webhooks/mercadopago`,
       statement_descriptor: "TECH4LOOP",
     };
-
-    if (!isLocalhost) {
-      preferenceBody.auto_return = "approved";
-    }
 
     const result = await preference.create({
       body: preferenceBody,
