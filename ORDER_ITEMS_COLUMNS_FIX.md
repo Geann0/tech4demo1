@@ -3,11 +3,13 @@
 ## Problem
 
 When adding products to an order (checkout), the system fails with:
+
 ```
 Erro ao adicionar produtos ao pedido: Could not find the 'partner_amount' column of 'order_items' in the schema cache
 ```
 
 This happens because the `order_items` table is missing the following columns:
+
 - `partner_amount` - Value the partner receives (92.5% of item total)
 - `platform_fee` - Platform fee (7.5% of item total)
 - `platform_fee_rate` - Fee percentage (default 7.5%)
@@ -35,17 +37,18 @@ The `order_items` table was created with only basic columns (id, created_at, upd
 Run this verification query in Supabase SQL Editor:
 
 ```sql
-SELECT 
-  column_name, 
-  data_type, 
-  is_nullable, 
+SELECT
+  column_name,
+  data_type,
+  is_nullable,
   column_default
-FROM information_schema.columns 
-WHERE table_name = 'order_items' 
+FROM information_schema.columns
+WHERE table_name = 'order_items'
 ORDER BY ordinal_position;
 ```
 
 **Expected columns:**
+
 - ✅ id (uuid)
 - ✅ order_id (uuid)
 - ✅ product_id (uuid)
@@ -60,6 +63,7 @@ ORDER BY ordinal_position;
 ## What Changed
 
 ### Database Schema
+
 ```sql
 ALTER TABLE order_items
 ADD COLUMN quantity INT DEFAULT 1;
@@ -71,17 +75,18 @@ ADD COLUMN platform_fee_rate DECIMAL(5,2) DEFAULT 7.5;
 
 ### Why These Columns Matter
 
-| Column | Purpose | Example |
-|--------|---------|---------|
-| `quantity` | Number of items ordered | 2 units |
-| `price_at_purchase` | Unit price at checkout | R$ 99.90 |
-| `partner_amount` | Partner's share (92.5%) | R$ 184.74 for R$ 199.80 total |
-| `platform_fee` | Tech4Loop's share (7.5%) | R$ 15.06 for R$ 199.80 total |
-| `platform_fee_rate` | Fee percentage | 7.5% |
+| Column              | Purpose                  | Example                       |
+| ------------------- | ------------------------ | ----------------------------- |
+| `quantity`          | Number of items ordered  | 2 units                       |
+| `price_at_purchase` | Unit price at checkout   | R$ 99.90                      |
+| `partner_amount`    | Partner's share (92.5%)  | R$ 184.74 for R$ 199.80 total |
+| `platform_fee`      | Tech4Loop's share (7.5%) | R$ 15.06 for R$ 199.80 total  |
+| `platform_fee_rate` | Fee percentage           | 7.5%                          |
 
 ### Fee Calculation Example
 
 For an item with total value of R$ 199.80 (2 × R$ 99.90):
+
 ```
 Total:           R$ 199.80
 Partner (92.5%): R$ 184.74  ← inserted in partner_amount
@@ -131,20 +136,24 @@ DROP INDEX IF EXISTS idx_order_items_platform_fee;
 ## Related Code
 
 ### Checkout Code (src/app/checkout/cartActions.ts)
+
 The code that tries to insert these values:
+
 ```typescript
 const orderItems = cart.items.map((item) => {
   const itemTotal = item.product_price * item.quantity;
-  const partnerAmount = Math.round(((itemTotal * (100 - platformFeeRate)) / 100) * 100) / 100;
-  const platformFee = Math.round(((itemTotal * platformFeeRate) / 100) * 100) / 100;
+  const partnerAmount =
+    Math.round(((itemTotal * (100 - platformFeeRate)) / 100) * 100) / 100;
+  const platformFee =
+    Math.round(((itemTotal * platformFeeRate) / 100) * 100) / 100;
 
   return {
     order_id: orderData.id,
     product_id: item.product_id,
     quantity: item.quantity,
     price_at_purchase: item.product_price,
-    partner_amount: partnerAmount,      // ← These columns
-    platform_fee: platformFee,          // ← were missing
+    partner_amount: partnerAmount, // ← These columns
+    platform_fee: platformFee, // ← were missing
     platform_fee_rate: platformFeeRate, // ← from the table
   };
 });

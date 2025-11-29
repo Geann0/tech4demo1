@@ -1,6 +1,7 @@
 # Stripe Local Testing Guide
 
 ## Current Status ✅
+
 - Dev server: **Running on localhost:3000**
 - Stripe integration: **Ready**
 - Webhook endpoint: **http://localhost:3000/api/payments/stripe-webhook**
@@ -9,19 +10,23 @@
 ## Option 1: Use Stripe Dashboard Test Mode (Recommended)
 
 ### 1. Use Test Card Numbers
+
 Test payments in your app using these card numbers:
 
 **Successful payment:**
+
 - Card: `4242 4242 4242 4242`
 - Expiry: `12/25` (any future date)
 - CVC: `123` (any 3 digits)
 
 **Payment that requires authentication:**
+
 - Card: `4000 0027 6000 3184`
 - Expiry: `12/25`
 - CVC: `123`
 
 **Payment that will be declined:**
+
 - Card: `4000 0000 0000 0002`
 - Expiry: `12/25`
 - CVC: `123`
@@ -35,6 +40,7 @@ Test payments in your app using these card numbers:
 5. To test: Click on the endpoint → "Send a test webhook" → Select event type
 
 ### 3. Monitor Webhooks
+
 - Stripe Dashboard: https://dashboard.stripe.com/test/webhooks
 - View all webhook events and responses
 
@@ -49,22 +55,27 @@ Test payments in your app using these card numbers:
 2. Extract to: `C:\stripe-cli\`
 
 3. Add to PATH:
+
    ```powershell
    $env:PATH += ";C:\stripe-cli"
    ```
 
 4. Verify installation:
+
    ```powershell
    stripe --version
    ```
 
 5. Login to Stripe:
+
    ```powershell
    stripe login
    ```
+
    This will open a browser and ask for API key. Paste your test key when prompted.
 
 6. Start listening to webhooks:
+
    ```powershell
    stripe listen --forward-to localhost:3000/api/payments/stripe-webhook
    ```
@@ -81,10 +92,10 @@ Test payments in your app using these card numbers:
 Create `scripts/test-webhook.js`:
 
 ```javascript
-import Stripe from 'stripe';
+import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2025-11-17.clover'
+  apiVersion: "2025-11-17.clover",
 });
 
 async function testWebhook() {
@@ -92,16 +103,15 @@ async function testWebhook() {
     // Create a test payment intent
     const paymentIntent = await stripe.paymentIntents.create({
       amount: 1000, // $10.00
-      currency: 'brl',
-      payment_method: 'pm_card_visa', // Test payment method
+      currency: "brl",
+      payment_method: "pm_card_visa", // Test payment method
       confirm: true,
     });
 
-    console.log('✅ Payment Intent Created:', paymentIntent.id);
-    console.log('Status:', paymentIntent.status);
-
+    console.log("✅ Payment Intent Created:", paymentIntent.id);
+    console.log("Status:", paymentIntent.status);
   } catch (error) {
-    console.error('❌ Error:', error);
+    console.error("❌ Error:", error);
   }
 }
 
@@ -115,27 +125,32 @@ Run: `node scripts/test-webhook.js`
 ## Testing Checklist
 
 ### 1. Login/Register
+
 - [ ] Register new account with email
 - [ ] Login with credentials
 - [ ] Test "Remember me"
 
 ### 2. Product Purchase
+
 - [ ] Add product to cart
 - [ ] Go to checkout
 - [ ] Enter test card: `4242 4242 4242 4242`
 - [ ] Complete payment
 
 ### 3. Verify Payment
+
 - Check Stripe Dashboard: https://dashboard.stripe.com/test/payments
 - Look for Payment Intent with status: `succeeded`
 - Check database: Should have order with payment_status = 'paid'
 
 ### 4. Verify Email Notifications
+
 - Confirmation email should be sent to the registered email
 - Check Resend Dashboard: https://dashboard.resend.com
 - Verify email in database: `email_logs` table
 
 ### 5. Partner Commission
+
 - If product has partner, check `partner_sales` table
 - Status should be: `pending_payout`
 - Commission should be: `(amount * commission_percentage) / 100`
@@ -145,19 +160,25 @@ Run: `node scripts/test-webhook.js`
 ## Common Issues
 
 ### Issue: Webhook not triggering
+
 **Solution:**
+
 - Ensure env var `STRIPE_WEBHOOK_SECRET` is set correctly
 - Check `.env.local` has the secret from `stripe listen` output
 - Restart dev server after updating `.env.local`
 
 ### Issue: Payment succeeds but order not created
+
 **Solution:**
+
 - Check database connection: `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`
 - Check server logs in terminal
 - Verify webhook endpoint is accessible
 
 ### Issue: Email not sent
+
 **Solution:**
+
 - Check Resend API key: `RESEND_API_KEY`
 - Check dashboard: https://dashboard.resend.com
 - Verify email address is in allowlist (if not in production)

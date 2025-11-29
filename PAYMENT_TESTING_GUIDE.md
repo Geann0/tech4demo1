@@ -1,6 +1,7 @@
 # 💳 Tech4Loop Payment System - Complete Testing Guide
 
 **Current Status:** ✅ **Production Ready**
+
 - Stripe Integration: **Active & Tested**
 - Webhook Endpoint: **http://localhost:3000/api/payments/stripe-webhook**
 - Payment Processing: **Working**
@@ -11,13 +12,16 @@
 ## 🚀 Quick Start (5 minutes)
 
 ### 1. Ensure Dev Server is Running
+
 ```powershell
 cd Tech4Loop
 npm run dev
 ```
+
 Should show: `✓ Ready in 3s` on port `3000`
 
 ### 2. Open Application
+
 ```
 http://localhost:3000
 ```
@@ -25,18 +29,21 @@ http://localhost:3000
 ### 3. Test Complete Payment Flow
 
 #### Register/Login
+
 ```
 Email: test@example.com
 Password: Test123!
 ```
 
 #### Add Product to Cart
+
 1. Click any product
 2. Click "Adicionar ao Carrinho"
 3. Login modal should appear
 4. Confirm "Adicionar ao Carrinho"
 
 #### Go to Checkout
+
 1. Click cart icon
 2. Click "Comprar"
 3. Fill in:
@@ -47,7 +54,9 @@ Password: Test123!
    - ZIP: "76920-000"
 
 #### Payment Details
+
 Use this test card:
+
 ```
 Card Number:  4242 4242 4242 4242
 Expiry:       12/25 (any future date)
@@ -56,6 +65,7 @@ Name:         JOÃO SILVA
 ```
 
 #### Complete Payment
+
 - Click "Confirmar Pagamento"
 - Wait 2-3 seconds
 - Should redirect to "Compra com Sucesso"
@@ -65,6 +75,7 @@ Name:         JOÃO SILVA
 ## 📊 Verify Payment Success
 
 ### Check 1: Stripe Dashboard
+
 https://dashboard.stripe.com/test/payments
 
 ```
@@ -75,13 +86,14 @@ Look for:
 ```
 
 ### Check 2: Database
+
 Connect to Supabase: https://app.supabase.com
 
 ```sql
 -- Check orders table
-SELECT * FROM orders 
-WHERE user_id = 'your-user-id' 
-ORDER BY created_at DESC 
+SELECT * FROM orders
+WHERE user_id = 'your-user-id'
+ORDER BY created_at DESC
 LIMIT 1;
 
 -- Expected columns:
@@ -93,6 +105,7 @@ LIMIT 1;
 ```
 
 ### Check 3: Email Notification
+
 Check email that received order confirmation:
 
 ```
@@ -102,10 +115,11 @@ Body: Should contain order details
 ```
 
 ### Check 4: Partner Commission
+
 If product has a partner:
 
 ```sql
-SELECT * FROM partner_sales 
+SELECT * FROM partner_sales
 WHERE order_id = 'your-order-id';
 
 -- Expected columns:
@@ -123,6 +137,7 @@ WHERE order_id = 'your-order-id';
 
 **Card:** `4242 4242 4242 4242`
 **Expected Result:**
+
 - Order created with status: `completed`
 - Payment status: `paid`
 - User redirected to success page
@@ -132,6 +147,7 @@ WHERE order_id = 'your-order-id';
 
 **Card:** `4000 0027 6000 3184`
 **Expected Result:**
+
 - 3D Secure popup appears
 - User completes authentication
 - Order created if authorized
@@ -141,6 +157,7 @@ WHERE order_id = 'your-order-id';
 
 **Card:** `4000 0000 0000 0002`
 **Expected Result:**
+
 - Payment declined error shown
 - Order NOT created
 - User can try again
@@ -150,6 +167,7 @@ WHERE order_id = 'your-order-id';
 
 **Card:** `4000 0000 0000 9995`
 **Expected Result:**
+
 - Error: "Insufficient funds"
 - Payment not processed
 
@@ -175,6 +193,7 @@ node scripts/test-stripe-webhook.js payment_intent.succeeded
 ```
 
 This will:
+
 1. Create a test payment intent in Stripe
 2. Generate a valid webhook signature
 3. Send it to your local webhook endpoint
@@ -187,6 +206,7 @@ This will:
 ### Issue: "Card declined" even with test card
 
 **Solution:**
+
 - Use exact test card: `4242 4242 4242 4242`
 - Expiry must be future date (e.g., `12/25`)
 - CVC: any 3 digits
@@ -195,6 +215,7 @@ This will:
 ### Issue: Payment succeeds but order not created
 
 **Solution:**
+
 ```powershell
 # 1. Check .env.local has STRIPE_WEBHOOK_SECRET
 echo $env:STRIPE_WEBHOOK_SECRET
@@ -212,6 +233,7 @@ npm run dev
 ### Issue: Email not received
 
 **Solution:**
+
 ```
 1. Check Resend Dashboard: https://dashboard.resend.com
 2. Verify RESEND_API_KEY is correct in .env.local
@@ -224,6 +246,7 @@ npm run dev
 ### Issue: Webhook signature error
 
 **Solution:**
+
 ```
 Error: "Invalid signature"
 Fix:
@@ -297,6 +320,7 @@ Fix:
 ## 🔐 Security Notes
 
 ### Test Secrets Used
+
 ```
 These are STRIPE TEST MODE secrets - Safe to use during development
 - NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_...
@@ -305,6 +329,7 @@ These are STRIPE TEST MODE secrets - Safe to use during development
 ```
 
 ### When Going to Production
+
 ```
 BEFORE deploying to production:
 
@@ -330,6 +355,7 @@ BEFORE deploying to production:
 ## 📞 Support
 
 **Issues?**
+
 1. Check server logs: `npm run dev` terminal
 2. Check Stripe Dashboard: https://dashboard.stripe.com/test/dashboard
 3. Check Resend Dashboard: https://dashboard.resend.com
@@ -337,6 +363,7 @@ BEFORE deploying to production:
 5. Restart dev server: Stop and run `npm run dev` again
 
 **Common Commands:**
+
 ```powershell
 # Restart dev server
 npm run dev

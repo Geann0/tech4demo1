@@ -20,17 +20,20 @@ Welcome! Your e-commerce platform is **ready to use**. Here's how to get started
 ## 🚀 Quick Start (2 minutes)
 
 ### 1. **Open Application**
+
 ```
 http://localhost:3000
 ```
 
 ### 2. **Register/Login**
+
 ```
 Email:    test@example.com
 Password: Test123!
 ```
 
 ### 3. **Test Payment**
+
 ```
 Card:   4242 4242 4242 4242
 Expiry: 12/25
@@ -45,19 +48,19 @@ That's it! Your platform is ready.
 
 ### 📖 **Core Guides**
 
-| Document | Purpose | Time |
-|----------|---------|------|
+| Document                                                   | Purpose                             | Time   |
+| ---------------------------------------------------------- | ----------------------------------- | ------ |
 | **[PAYMENT_TESTING_GUIDE.md](./PAYMENT_TESTING_GUIDE.md)** | Complete payment testing procedures | 10 min |
-| **[STRIPE_LOCAL_TESTING.md](./STRIPE_LOCAL_TESTING.md)** | How to test webhooks locally | 5 min |
-| **[PROJECT_STATUS.md](./PROJECT_STATUS.md)** | Full system status and setup | 15 min |
+| **[STRIPE_LOCAL_TESTING.md](./STRIPE_LOCAL_TESTING.md)**   | How to test webhooks locally        | 5 min  |
+| **[PROJECT_STATUS.md](./PROJECT_STATUS.md)**               | Full system status and setup        | 15 min |
 
 ### 🔧 **Technical Documentation**
 
-| Document | Purpose |
-|----------|---------|
+| Document                                 | Purpose                         |
+| ---------------------------------------- | ------------------------------- |
 | **[ARCHITECTURE.md](./ARCHITECTURE.md)** | System design & database schema |
-| **[README.md](./README.md)** | Project overview |
-| **[package.json](./package.json)** | Dependencies & scripts |
+| **[README.md](./README.md)**             | Project overview                |
+| **[package.json](./package.json)**       | Dependencies & scripts          |
 
 ### 📋 **Common Scripts**
 
@@ -83,22 +86,26 @@ node scripts/test-stripe-webhook.js payment_intent.succeeded
 ## 🧪 Testing Payments (Quick Guide)
 
 ### Step 1: Open Application
+
 ```
 http://localhost:3000
 ```
 
 ### Step 2: Create Account
+
 - Click "Registrar" (Register)
 - Enter email and password
 - Click "Criar Conta"
 
 ### Step 3: Add Product to Cart
+
 - Click any product
 - Click "Adicionar ao Carrinho" (Add to Cart)
 - Click the cart icon
 - Click "Comprar" (Buy)
 
 ### Step 4: Checkout
+
 - Fill in your address details
 - Enter test card: `4242 4242 4242 4242`
 - Expiry: `12/25`
@@ -106,6 +113,7 @@ http://localhost:3000
 - Click "Confirmar Pagamento" (Confirm Payment)
 
 ### Step 5: Verify Success
+
 - Should see "Compra com Sucesso" (Purchase Successful)
 - Check Stripe Dashboard: https://dashboard.stripe.com/test/payments
 - Check database: https://app.supabase.com
@@ -117,24 +125,28 @@ http://localhost:3000
 Your application has these integrations ready:
 
 ### 🗄️ **Database** (Supabase)
+
 - PostgreSQL database with 20+ tables
 - Real-time capabilities
 - Authentication built-in
 - Status: ✅ Connected
 
 ### 💳 **Payments** (Stripe)
+
 - Payment intent creation
 - Webhook handling
 - Test mode enabled (won't charge real cards)
 - Status: ✅ Ready
 
 ### 💌 **Emails** (Resend)
+
 - Order confirmations
 - Notifications
 - Marketing emails
 - Status: ✅ Ready
 
 ### 🔐 **Authentication** (Supabase Auth)
+
 - Email/password login
 - Session management
 - Role-based access
@@ -145,6 +157,7 @@ Your application has these integrations ready:
 ## 📊 Key Features
 
 ### For Customers
+
 - ✅ Browse products
 - ✅ Add to cart
 - ✅ Secure checkout
@@ -154,6 +167,7 @@ Your application has these integrations ready:
 - ✅ Leave reviews
 
 ### For Partners/Sellers
+
 - ✅ Manage products
 - ✅ View sales
 - ✅ Track commissions
@@ -161,6 +175,7 @@ Your application has these integrations ready:
 - ✅ Analyze performance
 
 ### For Admins
+
 - ✅ Product management
 - ✅ Order management
 - ✅ User management
@@ -172,6 +187,7 @@ Your application has these integrations ready:
 ## 🎯 Next Steps
 
 ### 1. **Test Everything** (Now)
+
 - [ ] Open http://localhost:3000
 - [ ] Register account
 - [ ] Browse products
@@ -179,12 +195,14 @@ Your application has these integrations ready:
 - [ ] Check order in database
 
 ### 2. **Review Code** (Optional)
+
 - [ ] Check `src/app/` for page structure
 - [ ] Check `src/components/` for components
 - [ ] Check `src/lib/` for utilities
 - [ ] Check `src/app/api/` for endpoints
 
 ### 3. **Deploy to Production** (When Ready)
+
 - [ ] Ensure all tests pass: `npm test`
 - [ ] Build for production: `npm run build`
 - [ ] Push to GitHub: `git push`
@@ -197,27 +215,35 @@ Your application has these integrations ready:
 ## ❓ Common Questions
 
 ### Q: How do I test payments?
+
 **A:** Use test card `4242 4242 4242 4242` - won't charge real money.
 
 ### Q: Where's my data stored?
+
 **A:** Supabase PostgreSQL database - accessible at https://app.supabase.com
 
 ### Q: How do I add more products?
+
 **A:** Go to Admin Dashboard → Products → Add Product
 
 ### Q: How do I invite sellers?
+
 **A:** Admin Dashboard → Partners → Send Invite
 
 ### Q: How do I go live with real payments?
+
 **A:** Update `.env.local` with LIVE Stripe keys, update webhook endpoint, test again.
 
 ### Q: How do I monitor payments?
+
 **A:** Stripe Dashboard: https://dashboard.stripe.com
 
 ### Q: How do I check emails?
+
 **A:** Resend Dashboard: https://dashboard.resend.com
 
 ### Q: How do I view database?
+
 **A:** Supabase Dashboard: https://app.supabase.com
 
 ---
@@ -225,6 +251,7 @@ Your application has these integrations ready:
 ## 🐛 Having Issues?
 
 ### Dev Server Won't Start
+
 ```powershell
 # Clear cache and restart
 rm -r .next -Force
@@ -232,17 +259,20 @@ npm run dev
 ```
 
 ### Payment Not Working
+
 - Check Stripe keys in `.env.local`
 - Use test card: `4242 4242 4242 4242`
 - Check server logs for errors
 - Verify webhook endpoint is accessible
 
 ### Database Connection Error
+
 - Check `.env.local` has Supabase URL
 - Verify internet connection
 - Check Supabase status: https://status.supabase.com
 
 ### Email Not Sending
+
 - Check Resend API key in `.env.local`
 - Verify email format in checkout
 - Check Resend Dashboard for logs
@@ -253,14 +283,14 @@ npm run dev
 
 ## 📞 Useful Links
 
-| Service | Link | Purpose |
-|---------|------|---------|
-| **Application** | http://localhost:3000 | Main app |
-| **Stripe** | https://dashboard.stripe.com | Payments |
-| **Supabase** | https://app.supabase.com | Database |
-| **Resend** | https://dashboard.resend.com | Emails |
-| **Vercel** | https://vercel.com | Deployment |
-| **GitHub** | https://github.com/Geann0/Tech4Loop | Code |
+| Service         | Link                                | Purpose    |
+| --------------- | ----------------------------------- | ---------- |
+| **Application** | http://localhost:3000               | Main app   |
+| **Stripe**      | https://dashboard.stripe.com        | Payments   |
+| **Supabase**    | https://app.supabase.com            | Database   |
+| **Resend**      | https://dashboard.resend.com        | Emails     |
+| **Vercel**      | https://vercel.com                  | Deployment |
+| **GitHub**      | https://github.com/Geann0/Tech4Loop | Code       |
 
 ---
 
@@ -279,6 +309,7 @@ Before going live, ensure:
 - [ ] Stripe keys are still in TEST mode ✅
 
 Once all checked:
+
 1. Update Stripe keys to LIVE mode
 2. Deploy to Vercel
 3. Test with real payment method
@@ -316,6 +347,7 @@ Uptime SLA:         99.9% (Vercel)
 Your e-commerce platform is **fully functional and production-ready**.
 
 ### Right now you can:
+
 - ✅ Accept payments from customers
 - ✅ Process orders automatically
 - ✅ Send order confirmations
@@ -323,6 +355,7 @@ Your e-commerce platform is **fully functional and production-ready**.
 - ✅ Manage your business online
 
 ### What's running:
+
 ```
 🟢 Dev Server:     http://localhost:3000
 🟢 Database:       Supabase
