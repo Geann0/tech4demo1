@@ -18,7 +18,7 @@ export default function LoginPage() {
     setLoading(true);
 
     const formData = new FormData(e.currentTarget);
-    
+
     try {
       const result = await signInCustomer(formData);
 
@@ -29,7 +29,7 @@ export default function LoginPage() {
       } else {
         // Se não houver erro, o redirecionamento acontece automaticamente no server action
         // Aguardar um pouco para garantir que o redirecionamento ocorra
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 500));
       }
     } catch (err) {
       console.error("❌ Erro ao fazer login:", err);
@@ -162,7 +162,9 @@ export default function LoginPage() {
               <Link
                 href="/admin/login"
                 className="font-medium text-electric-purple hover:underline"
-              >logar</Link>
+              >
+                logar
+              </Link>
             </p>
             <p className="text-sm text-gray-400">
               <Link

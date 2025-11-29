@@ -22,7 +22,9 @@ export default function ProductDetailsClient({
 }: {
   product: ProductWithCategoryAndProfile;
 }) {
-  const [mainImage, setMainImage] = useState(product.image_urls[0] || "/images/placeholder.png");
+  const [mainImage, setMainImage] = useState(
+    product.image_urls[0] || "/images/placeholder.png"
+  );
   const { addToCart, cart } = useCart();
   const router = useRouter();
   const [isAdding, setIsAdding] = useState(false);
@@ -49,7 +51,12 @@ export default function ProductDetailsClient({
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log("🔄 Auth state changed - Event:", _event, "User:", session?.user?.email);
+      console.log(
+        "🔄 Auth state changed - Event:",
+        _event,
+        "User:",
+        session?.user?.email
+      );
       setIsAuthenticated(!!session?.user);
     });
 
@@ -132,14 +139,21 @@ export default function ProductDetailsClient({
                   priority
                   className="object-contain"
                   onError={() => {
-                    console.error("❌ Erro ao carregar imagem principal:", mainImage);
+                    console.error(
+                      "❌ Erro ao carregar imagem principal:",
+                      mainImage
+                    );
                     setImageError(true);
                   }}
                 />
               ) : (
                 <div className="text-center p-4 flex flex-col items-center justify-center">
-                  <p className="text-yellow-400 mb-3 font-bold">⚠️ Imagem não disponível</p>
-                  <p className="text-gray-400 text-sm mb-4">A imagem principal não pode ser carregada</p>
+                  <p className="text-yellow-400 mb-3 font-bold">
+                    ⚠️ Imagem não disponível
+                  </p>
+                  <p className="text-gray-400 text-sm mb-4">
+                    A imagem principal não pode ser carregada
+                  </p>
                   {mainImage && (
                     <p className="text-xs text-gray-600 break-all font-mono bg-gray-700 p-2 rounded">
                       {mainImage.substring(0, 50)}...

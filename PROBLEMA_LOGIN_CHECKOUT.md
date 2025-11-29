@@ -4,7 +4,7 @@
 
 ## 🎯 Solução Rápida
 
-O problema é que a página de **checkout não está verificando se você está logado**. 
+O problema é que a página de **checkout não está verificando se você está logado**.
 
 Você tem 2 opções:
 
@@ -13,15 +13,17 @@ Você tem 2 opções:
 ## OPÇÃO A: Usar o Menu Acima (RECOMENDADO)
 
 ### Passo 1: Procure no topo da página
+
 ```
 Tem um MENU com:
 - 🔍 Busca
-- ❤️ Favoritos  
+- ❤️ Favoritos
 - 🛒 Carrinho
 - 👤 Minha Conta
 ```
 
 ### Passo 2: Clique em "Minha Conta" (👤)
+
 ```
 Você verá:
 - Login
@@ -31,6 +33,7 @@ Você verá:
 ### Passo 3: Clique em "Login" ou "Registrar"
 
 ### Passo 4: Após fazer login
+
 ```
 Volte para: http://localhost:3000/checkout
 ```
@@ -52,6 +55,7 @@ Clique "Login"
 ```
 
 Após fazer login, abra:
+
 ```
 http://localhost:3000/checkout
 ```
@@ -61,11 +65,13 @@ http://localhost:3000/checkout
 ## ✅ Após fazer Login, teste o Pagamento:
 
 ### Passo 1: Abra
+
 ```
 http://localhost:3000/checkout
 ```
 
 ### Passo 2: Preencha o formulário
+
 ```
 Email: seu-email@gmail.com (ja preenchido)
 Cartão: 4242 4242 4242 4242
@@ -76,9 +82,10 @@ CVV: 567
 ### Passo 3: Clique "Pagar"
 
 ### Resultado Esperado:
+
 ✅ Mensagem "Pagamento confirmado"  
 ✅ Webhook recebe "payment_intent.succeeded"  
-✅ Email de confirmação  
+✅ Email de confirmação
 
 ---
 
@@ -87,12 +94,14 @@ CVV: 567
 ### Verifique se tem 2 Terminais abertos:
 
 **Terminal 1:**
+
 ```bash
 npm run dev
 # Deve mostrar: ✓ Ready in X.Xs
 ```
 
 **Terminal 2:**
+
 ```bash
 $env:PATH += ";C:\stripe-cli"
 stripe listen --forward-to localhost:3000/api/payments/stripe-webhook
@@ -111,6 +120,7 @@ Se algum terminal não está rodando, abra um novo e execute.
 1. Me avise: "Pagamento testado com sucesso! ✅"
 
 2. Vamos fazer deploy:
+
    ```bash
    git push main
    ```

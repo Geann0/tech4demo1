@@ -104,18 +104,16 @@ async function handlePaymentIntentSucceeded(
 
   // 3. Criar evento de auditoria (opcional)
   try {
-    await supabase
-      .from("audit_logs")
-      .insert({
-        action: "payment_completed",
-        order_id: orderId,
-        user_id: userId,
-        details: {
-          stripe_intent_id: paymentIntent.id,
-          amount: paymentIntent.amount,
-          currency: paymentIntent.currency,
-        },
-      });
+    await supabase.from("audit_logs").insert({
+      action: "payment_completed",
+      order_id: orderId,
+      user_id: userId,
+      details: {
+        stripe_intent_id: paymentIntent.id,
+        amount: paymentIntent.amount,
+        currency: paymentIntent.currency,
+      },
+    });
   } catch (err) {
     console.error("Audit log error:", err);
   }
@@ -214,16 +212,14 @@ async function recordPartnerSales(orderId: string, order: any) {
         const commission = (item.price * item.quantity * 0.1) / 100; // 10%
 
         try {
-          await supabase
-            .from("partner_sales")
-            .insert({
-              partner_id: product.partner_id,
-              order_id: orderId,
-              product_id: item.product_id,
-              amount: item.price * item.quantity,
-              commission: commission,
-              status: "pending_payout",
-            });
+          await supabase.from("partner_sales").insert({
+            partner_id: product.partner_id,
+            order_id: orderId,
+            product_id: item.product_id,
+            amount: item.price * item.quantity,
+            commission: commission,
+            status: "pending_payout",
+          });
         } catch (err) {
           console.error("Partner sales record error:", err);
         }

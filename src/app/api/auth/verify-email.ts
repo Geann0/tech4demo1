@@ -20,13 +20,11 @@ export async function generateVerificationToken(
   const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 horas
 
   try {
-    await supabase
-      .from("email_verification_tokens")
-      .insert({
-        email,
-        token,
-        expires_at: expiresAt.toISOString(),
-      });
+    await supabase.from("email_verification_tokens").insert({
+      email,
+      token,
+      expires_at: expiresAt.toISOString(),
+    });
   } catch (err) {
     console.error("Token creation error:", err);
   }

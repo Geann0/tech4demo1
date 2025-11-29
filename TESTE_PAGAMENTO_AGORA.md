@@ -31,6 +31,7 @@ http://localhost:3000/checkout
 ```
 
 Você verá:
+
 - ✅ Formulário de checkout
 - ✅ Campo de cartão Stripe
 - ✅ Botão "Pagar"
@@ -48,10 +49,12 @@ Nome: Seu Nome
 ### PASSO 3: Clique "Pagar"
 
 Você verá:
+
 - ✅ Spinner de loading
 - ✅ Página de "Pagamento confirmado" ou mensagem de sucesso
 
 Se vir erro, verifique:
+
 - Terminal 2 tem `stripe listen` rodando?
 - Se não, abra novo terminal e rode:
   ```bash
@@ -278,6 +281,7 @@ Se algo não funcionar, **antes de tudo:**
    - Terminal 2: `stripe listen --forward-to...` (webhook)
 
 2. Se não tiver Terminal 2, abra um novo:
+
    ```bash
    cd "C:\Users\haduk\OneDrive\Desktop\Tech4Loop (1)\Tech4Loop"
    $env:PATH += ";C:\stripe-cli"
@@ -293,12 +297,14 @@ Se algo não funcionar, **antes de tudo:**
 **URL:** http://localhost:3000/checkout
 
 **Dados de teste:**
+
 - Email: seu-email@gmail.com
 - Cartão: 4242 4242 4242 4242
 - Data: 12/34
 - CVV: 567
 
 **Resultado esperado:**
+
 - ✅ "Pagamento confirmado"
 - ✅ Email recebido
 - ✅ Webhook viu evento
