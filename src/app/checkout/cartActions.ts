@@ -224,10 +224,18 @@ export async function processCartCheckout(
     });
     const preference = new Preference(client);
 
-    const siteUrl =
-      process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3002";
-    const isLocalhost =
-      siteUrl.includes("localhost") || siteUrl.includes("127.0.0.1");
+    // Garantir que siteUrl seja sempre absoluto
+    let siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000";
+    
+    // Se não tiver http/https, adicionar
+    if (!siteUrl.startsWith("http://") && !siteUrl.startsWith("https://")) {
+      siteUrl = `http://${siteUrl}`;
+    }
+    
+    // Remover trailing slash
+    siteUrl = siteUrl.replace(/\/$/, "");
+    
+    console.log("🌐 Site URL configurada:", siteUrl);
 
     // Configurar métodos de pagamento
     const paymentMethods: any = {
@@ -323,6 +331,13 @@ export async function processCartCheckout(
       notification_url: `${siteUrl}/api/webhooks/mercadopago`,
       statement_descriptor: "TECH4LOOP",
     };
+
+    console.log("🔗 URLs de retorno configuradas:", {
+      success: preferenceBody.back_urls.success,
+      failure: preferenceBody.back_urls.failure,
+      pending: preferenceBody.back_urls.pending,
+      auto_return: preferenceBody.auto_return,
+    });
 
     const result = await preference.create({
       body: preferenceBody,
