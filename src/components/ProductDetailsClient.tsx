@@ -22,13 +22,14 @@ export default function ProductDetailsClient({
 }: {
   product: ProductWithCategoryAndProfile;
 }) {
-  const [mainImage, setMainImage] = useState(product.image_urls[0]);
+  const [mainImage, setMainImage] = useState(product.image_urls[0] || "/images/placeholder.png");
   const { addToCart, cart } = useCart();
   const router = useRouter();
   const [isAdding, setIsAdding] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showCartPreview, setShowCartPreview] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const supabase = createClientComponentClient();
 
   // Verificar autenticação
@@ -38,6 +39,7 @@ export default function ProductDetailsClient({
       const {
         data: { session },
       } = await supabase.auth.getSession();
+      console.log("🔍 Auth check - Session:", session?.user?.email);
       setIsAuthenticated(!!session?.user);
     };
 
@@ -47,6 +49,7 @@ export default function ProductDetailsClient({
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log("🔄 Auth state changed - Event:", _event, "User:", session?.user?.email);
       setIsAuthenticated(!!session?.user);
     });
 
@@ -55,8 +58,15 @@ export default function ProductDetailsClient({
 
   const handleAddToCart = () => {
     // 🔒 Exigir login
+    console.log("🛒 handleAddToCart - isAuthenticated:", isAuthenticated);
     if (isAuthenticated === false) {
+      console.log("🔐 Abrindo modal de login (add to cart)");
       setShowLoginModal(true);
+      return;
+    }
+
+    if (isAuthenticated === null) {
+      console.warn("⚠️ Ainda verificando autenticação...");
       return;
     }
 
@@ -75,7 +85,9 @@ export default function ProductDetailsClient({
 
   const handleBuyNow = () => {
     // 🔒 Exigir login
+    console.log("💳 handleBuyNow - isAuthenticated:", isAuthenticated);
     if (isAuthenticated === false) {
+      console.log("🔐 Abrindo modal de login (buy now)");
       setShowLoginModal(true);
       return;
     }
@@ -110,15 +122,31 @@ export default function ProductDetailsClient({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           {/* Galeria de Imagens */}
           <div>
-            <div className="relative w-full h-96 rounded-lg mb-4 border border-gray-700 overflow-hidden">
-              <Image
-                src={mainImage}
-                alt={product.name}
-                fill
-                style={{ objectFit: "contain" }}
-                priority
-                className="bg-gray-800"
-              />
+            <div className="relative w-full h-96 rounded-lg mb-4 border border-gray-700 overflow-hidden bg-gray-800 flex items-center justify-center">
+              {!imageError && mainImage && mainImage.length > 0 ? (
+                <Image
+                  src={mainImage}
+                  alt={product.name}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  priority
+                  className="object-contain"
+                  onError={() => {
+                    console.error("❌ Erro ao carregar imagem principal:", mainImage);
+                    setImageError(true);
+                  }}
+                />
+              ) : (
+                <div className="text-center p-4 flex flex-col items-center justify-center">
+                  <p className="text-yellow-400 mb-3 font-bold">⚠️ Imagem não disponível</p>
+                  <p className="text-gray-400 text-sm mb-4">A imagem principal não pode ser carregada</p>
+                  {mainImage && (
+                    <p className="text-xs text-gray-600 break-all font-mono bg-gray-700 p-2 rounded">
+                      {mainImage.substring(0, 50)}...
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
             <div className="grid grid-cols-5 gap-2">
               {product.image_urls.map((url, index) => (
@@ -129,14 +157,20 @@ export default function ProductDetailsClient({
                       ? "border-neon-blue"
                       : "border-transparent"
                   }`}
-                  onClick={() => setMainImage(url)}
+                  onClick={() => {
+                    setMainImage(url);
+                    setImageError(false); // Reset error quando muda de imagem
+                  }}
                 >
                   <Image
                     src={url}
                     alt={`${product.name} thumbnail ${index + 1}`}
                     fill
-                    style={{ objectFit: "contain" }}
-                    className="bg-gray-800 rounded"
+                    sizes="(max-width: 768px) 20vw, 10vw"
+                    className="object-contain bg-gray-800 rounded"
+                    onError={() => {
+                      console.warn("⚠️ Erro ao carregar thumbnail:", url);
+                    }}
                   />
                 </div>
               ))}

@@ -31,13 +31,21 @@ export default function RegisterPage() {
     formData.append("lgpdConsent", "true");
     formData.append("lgpdConsentDate", new Date().toISOString());
 
-    const result = await registerUser(formData);
+    try {
+      const result = await registerUser(formData);
 
-    if (result.error) {
-      setError(result.error);
+      if (result.error) {
+        setError(result.error);
+        setLoading(false);
+        console.error("❌ Register error:", result.error);
+      } else {
+        // Sucesso - redirecionar para login com mensagem de confirmação
+        router.push("/login?registered=true");
+      }
+    } catch (err) {
+      console.error("❌ Erro ao criar conta:", err);
+      setError("Erro ao processar registro. Tente novamente.");
       setLoading(false);
-    } else {
-      router.push("/login?registered=true");
     }
   }
 

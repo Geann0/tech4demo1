@@ -18,13 +18,24 @@ export default function LoginPage() {
     setLoading(true);
 
     const formData = new FormData(e.currentTarget);
-    const result = await signInCustomer(formData);
+    
+    try {
+      const result = await signInCustomer(formData);
 
-    if (result?.error) {
-      setError(result.error);
+      if (result?.error) {
+        setError(result.error);
+        setLoading(false);
+        console.error("❌ Sign-in error:", result.error);
+      } else {
+        // Se não houver erro, o redirecionamento acontece automaticamente no server action
+        // Aguardar um pouco para garantir que o redirecionamento ocorra
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+    } catch (err) {
+      console.error("❌ Erro ao fazer login:", err);
+      setError("Erro ao processar login. Tente novamente.");
       setLoading(false);
     }
-    // Se não houver erro, o redirecionamento acontece no server action
   }
 
   return (
