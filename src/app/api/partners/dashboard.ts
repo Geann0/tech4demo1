@@ -99,14 +99,14 @@ export async function GET(request: NextRequest) {
         salesCount: sales?.length || 0,
       },
       sales:
-        sales?.map((s) => ({
+        sales?.map((s: any) => ({
           id: s.id,
           orderId: s.order_id,
-          productName: s.products?.name,
+          productName: (s.products as any)?.name,
           amount: s.amount / 100,
           commission: s.commission / 100,
           status: s.status,
-          orderStatus: s.orders?.status,
+          orderStatus: (s.orders as any)?.status,
           date: s.created_at,
         })) || [],
       payouts:
@@ -119,8 +119,8 @@ export async function GET(request: NextRequest) {
           createdAt: p.created_at,
         })) || [],
       topProducts:
-        topProducts?.map((p) => ({
-          name: p.products?.name,
+        topProducts?.map((p: any) => ({
+          name: (p.products as any)?.name,
           amount: p.amount / 100,
         })) || [],
     });

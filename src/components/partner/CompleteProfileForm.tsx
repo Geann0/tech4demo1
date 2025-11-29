@@ -25,7 +25,7 @@ interface CompleteProfileFormProps {
 export default function CompleteProfileForm({
   initialData,
 }: CompleteProfileFormProps) {
-  const initialState = { error: null, success: false };
+  const initialState: any = { error: "", success: false };
   const [state, formAction] = useFormState(savePartnerLegalData, initialState);
 
   const [personType, setPersonType] = useState<"pf" | "pj">(

@@ -3,7 +3,7 @@ import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  apiVersion: "2023-10-16",
+  apiVersion: "2025-11-17.clover",
 });
 
 const supabase = createClient(
@@ -103,19 +103,22 @@ async function handlePaymentIntentSucceeded(
   }
 
   // 3. Criar evento de auditoria (opcional)
-  await supabase
-    .from("audit_logs")
-    .insert({
-      action: "payment_completed",
-      order_id: orderId,
-      user_id: userId,
-      details: {
-        stripe_intent_id: paymentIntent.id,
-        amount: paymentIntent.amount,
-        currency: paymentIntent.currency,
-      },
-    })
-    .catch((err) => console.error("Audit log error:", err));
+  try {
+    await supabase
+      .from("audit_logs")
+      .insert({
+        action: "payment_completed",
+        order_id: orderId,
+        user_id: userId,
+        details: {
+          stripe_intent_id: paymentIntent.id,
+          amount: paymentIntent.amount,
+          currency: paymentIntent.currency,
+        },
+      });
+  } catch (err) {
+    console.error("Audit log error:", err);
+  }
 
   // 4. Enviar email de confirmação (será integrado com Resend depois)
   // sendOrderConfirmationEmail(order.email, order);
@@ -210,17 +213,20 @@ async function recordPartnerSales(orderId: string, order: any) {
         // Registrar venda do parceiro (comissão = 10% por padrão)
         const commission = (item.price * item.quantity * 0.1) / 100; // 10%
 
-        await supabase
-          .from("partner_sales")
-          .insert({
-            partner_id: product.partner_id,
-            order_id: orderId,
-            product_id: item.product_id,
-            amount: item.price * item.quantity,
-            commission: commission,
-            status: "pending_payout",
-          })
-          .catch((err) => console.error("Partner sales record error:", err));
+        try {
+          await supabase
+            .from("partner_sales")
+            .insert({
+              partner_id: product.partner_id,
+              order_id: orderId,
+              product_id: item.product_id,
+              amount: item.price * item.quantity,
+              commission: commission,
+              status: "pending_payout",
+            });
+        } catch (err) {
+          console.error("Partner sales record error:", err);
+        }
       }
     }
   } catch (error) {

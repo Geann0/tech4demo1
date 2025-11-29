@@ -81,11 +81,11 @@ export function getOptimizedImageProps(
     fill?: boolean;
     objectFit?: 'cover' | 'contain' | 'fill';
   }
-) {
+): Record<string, any> {
   const sizes = IMAGE_SIZES[preset];
   const quality = options?.quality ?? IMAGE_QUALITY.PRODUCT;
 
-  return {
+  const props: Record<string, any> = {
     src,
     alt,
     width: options?.fill ? undefined : sizes.width,
@@ -94,12 +94,15 @@ export function getOptimizedImageProps(
     priority: options?.priority ?? false,
     placeholder: 'blur' as const,
     blurDataURL: BLUR_PLACEHOLDER,
-    loading: options?.priority ? 'eager' : ('lazy' as const),
-    ...(options?.fill && {
-      fill: true,
-      objectFit: options?.objectFit ?? 'cover',
-    }),
+    loading: options?.priority ? 'eager' : 'lazy',
   };
+
+  if (options?.fill) {
+    props.fill = true;
+    props.objectFit = options?.objectFit ?? 'cover';
+  }
+
+  return props;
 }
 
 /**
@@ -273,7 +276,7 @@ export function getImageSrcSet(
   return sizes.map((size) => `${baseUrl}?w=${size} ${size}w`).join(', ');
 }
 
-export default {
+const imageOptimizationConfig = {
   IMAGE_QUALITY,
   IMAGE_SIZES,
   RESPONSIVE_SIZES,
@@ -287,3 +290,5 @@ export default {
   preloadImage,
   getImageSrcSet,
 };
+
+export default imageOptimizationConfig;

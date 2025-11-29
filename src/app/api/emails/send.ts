@@ -53,19 +53,22 @@ export async function POST(request: NextRequest) {
     }
 
     // Log email no banco
-    await supabase
-      .from("email_logs")
-      .insert({
-        type,
-        recipient: email,
-        status: "sent",
-        message_id: result?.id,
-      })
-      .catch((err) => console.error("Email log error:", err));
+    try {
+      await supabase
+        .from("email_logs")
+        .insert({
+          type,
+          recipient: email,
+          status: "sent",
+          message_id: (result as any)?.id || (result as any)?.email_id,
+        });
+    } catch (err) {
+      console.error("Email log error:", err);
+    }
 
     return NextResponse.json({
       success: true,
-      message_id: result?.id,
+      message_id: (result as any)?.id || (result as any)?.email_id,
     });
   } catch (error) {
     console.error("Email sending error:", error);

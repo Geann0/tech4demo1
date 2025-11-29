@@ -19,14 +19,17 @@ export async function generateVerificationToken(
   const token = crypto.randomBytes(32).toString("hex");
   const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 horas
 
-  await supabase
-    .from("email_verification_tokens")
-    .insert({
-      email,
-      token,
-      expires_at: expiresAt.toISOString(),
-    })
-    .catch((err) => console.error("Token creation error:", err));
+  try {
+    await supabase
+      .from("email_verification_tokens")
+      .insert({
+        email,
+        token,
+        expires_at: expiresAt.toISOString(),
+      });
+  } catch (err) {
+    console.error("Token creation error:", err);
+  }
 
   return token;
 }
@@ -77,7 +80,7 @@ export async function POST(request: NextRequest) {
           email,
           data: {
             verificationToken: token,
-            userName: user.email?.split("@")[0],
+            userName: email?.split("@")[0],
           },
         }),
       }
@@ -155,11 +158,14 @@ export async function GET(request: NextRequest) {
     }
 
     // Deletar token após uso
-    await supabase
-      .from("email_verification_tokens")
-      .delete()
-      .eq("id", verificationData.id)
-      .catch((err) => console.error("Token deletion error:", err));
+    try {
+      await supabase
+        .from("email_verification_tokens")
+        .delete()
+        .eq("id", verificationData.id);
+    } catch (err) {
+      console.error("Token deletion error:", err);
+    }
 
     return NextResponse.json({
       success: true,
