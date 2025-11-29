@@ -95,12 +95,22 @@ export default function CheckoutCartForm({
   }, [saveData]);
 
   useEffect(() => {
+    console.log("🔍 CheckoutCartForm - State mudou:", {
+      success: state.success,
+      paymentUrl: state.paymentUrl,
+      error: state.error,
+    });
+
     if (state.success && state.paymentUrl) {
+      console.log("✅ Redirecionando para Mercado Pago:", state.paymentUrl);
       if (saveData) {
         saveCheckoutData(formData);
       }
       clearCart();
+      console.log("🚀 Executando redirect agora...");
       window.location.href = state.paymentUrl;
+    } else if (state.error) {
+      console.error("❌ Erro no checkout:", state.error);
     }
   }, [state, saveData, formData, clearCart]);
 

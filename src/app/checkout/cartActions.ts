@@ -332,6 +332,11 @@ export async function processCartCheckout(
     });
 
     console.log("✅ Mercado Pago preference created:", result.id);
+    console.log("🔗 Payment URL (init_point):", result.init_point);
+    console.log("📦 Retornando objeto:", {
+      success: true,
+      paymentUrl: result.init_point,
+    });
 
     return {
       success: true,
