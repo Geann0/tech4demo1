@@ -44,12 +44,12 @@ export async function POST(req: NextRequest) {
       email,
       phone,
       subject: subject || "Novo Contato do Site Tech4Loop",
-      message
+      message,
     });
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       success: true,
-      message: "Demo mode: Contact form submission logged (email not sent)"
+      message: "Demo mode: Contact form submission logged (email not sent)",
     });
   } catch (error) {
     console.error("Erro ao processar contato:", error);

@@ -1,29 +1,16 @@
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+﻿// ================================================================
+// DEMO VERSION - Debug Session Desabilitado
+// ================================================================
 import { NextResponse } from "next/server";
 
 export async function GET() {
-  const supabase = createRouteHandlerClient({ cookies });
-
-  const {
-    data: { session },
-    error: sessionError,
-  } = await supabase.auth.getSession();
-
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-
+  console.log(" [DEMO] Simulando debug session (sem autenticação real)");
   return NextResponse.json({
-    hasSession: !!session,
-    hasUser: !!user,
-    userId: user?.id,
-    userEmail: user?.email,
-    sessionError: sessionError?.message,
-    userError: userError?.message,
-    cookies: cookies()
-      .getAll()
-      .map((c) => ({ name: c.name, hasValue: !!c.value })),
+    hasSession: false,
+    hasUser: false,
+    userId: null,
+    userEmail: null,
+    message: "Demo mode: Autenticação desabilitada",
+    cookies: [],
   });
 }
