@@ -13,6 +13,7 @@ export const mockProducts = [
     stock: 50,
     is_featured: true,
     partner_id: null,
+    partner_name: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     profiles: null
@@ -30,6 +31,7 @@ export const mockProducts = [
     stock: 30,
     is_featured: true,
     partner_id: null,
+    partner_name: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     profiles: null
@@ -47,6 +49,7 @@ export const mockProducts = [
     stock: 40,
     is_featured: true,
     partner_id: null,
+    partner_name: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     profiles: null
@@ -64,6 +67,7 @@ export const mockProducts = [
     stock: 60,
     is_featured: false,
     partner_id: null,
+    partner_name: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     profiles: null
@@ -81,6 +85,7 @@ export const mockProducts = [
     stock: 25,
     is_featured: false,
     partner_id: null,
+    partner_name: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     profiles: null
@@ -98,6 +103,7 @@ export const mockProducts = [
     stock: 80,
     is_featured: false,
     partner_id: null,
+    partner_name: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     profiles: null
@@ -115,6 +121,7 @@ export const mockProducts = [
     stock: 45,
     is_featured: false,
     partner_id: null,
+    partner_name: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     profiles: null
@@ -132,6 +139,7 @@ export const mockProducts = [
     stock: 35,
     is_featured: false,
     partner_id: null,
+    partner_name: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     profiles: null
