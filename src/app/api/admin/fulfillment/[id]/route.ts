@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
+// DEMO VERSION - Order status update disabled
 export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -13,14 +8,11 @@ export async function PATCH(
   const { status } = await request.json();
 
   try {
-    const { error } = await supabaseAdmin
-      .from("orders")
-      .update({ status })
-      .eq("id", params.id);
-
-    if (error) throw error;
-
-    return NextResponse.json({ success: true });
+    // Mock successful status update
+    return NextResponse.json({ 
+      success: true,
+      message: "Demo mode: Order status update is disabled"
+    });
   } catch (error) {
     console.error("Erro ao atualizar status:", error);
     return NextResponse.json(
