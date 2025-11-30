@@ -7,9 +7,9 @@ export async function GET(request: NextRequest) {
 
   try {
     // Mock empty fulfillment orders
-    return NextResponse.json({ 
+    return NextResponse.json({
       orders: [],
-      message: "Demo mode: No fulfillment orders available"
+      message: "Demo mode: No fulfillment orders available",
     });
   } catch (error) {
     console.error("Erro ao buscar pedidos WMS:", error);

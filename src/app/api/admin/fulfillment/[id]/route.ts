@@ -9,9 +9,9 @@ export async function PATCH(
 
   try {
     // Mock successful status update
-    return NextResponse.json({ 
+    return NextResponse.json({
       success: true,
-      message: "Demo mode: Order status update is disabled"
+      message: "Demo mode: Order status update is disabled",
     });
   } catch (error) {
     console.error("Erro ao atualizar status:", error);

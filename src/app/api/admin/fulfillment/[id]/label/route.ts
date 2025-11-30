@@ -11,7 +11,7 @@ export async function POST(
       success: true,
       trackingCode: `DEMO-${params.id.substring(0, 8).toUpperCase()}`,
       labelUrl: "https://example.com/demo-label.pdf",
-      message: "Demo mode: Shipping label generation is disabled"
+      message: "Demo mode: Shipping label generation is disabled",
     });
   } catch (error) {
     console.error("Erro ao gerar etiqueta:", error);
