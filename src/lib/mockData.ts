@@ -4,6 +4,7 @@ export const mockProducts = [
     id: "demo-1",
     name: "Fone de Ouvido Bluetooth ProSound X1",
     slug: "fone-prosound-x1",
+    short_description: "Fone sem fio com cancelamento de ruído e 30h de bateria",
     description: "Fone de ouvido sem fio com cancelamento de ruído ativo, bateria de até 30 horas e som de alta fidelidade. Perfeito para trabalho e entretenimento.",
     price: 299.90,
     image_urls: [
@@ -22,6 +23,7 @@ export const mockProducts = [
     id: "demo-2",
     name: "Smartwatch Tech Ultra 2024",
     slug: "smartwatch-tech-ultra",
+    short_description: "Relógio inteligente com monitoramento completo e 7 dias de bateria",
     description: "Relógio inteligente com monitoramento de saúde completo, GPS integrado, resistente à água e bateria de 7 dias. Compatível com iOS e Android.",
     price: 899.90,
     image_urls: [
@@ -40,6 +42,7 @@ export const mockProducts = [
     id: "demo-3",
     name: "Teclado Mecânico RGB Gamer Pro",
     slug: "teclado-gamer-pro",
+    short_description: "Teclado mecânico com iluminação RGB e estrutura em alumínio",
     description: "Teclado mecânico com switches blue, iluminação RGB customizável, teclas anti-ghosting e estrutura em alumínio. Ideal para games e digitação.",
     price: 449.90,
     image_urls: [
@@ -58,6 +61,7 @@ export const mockProducts = [
     id: "demo-4",
     name: "Mouse Wireless Precision Max",
     slug: "mouse-precision-max",
+    short_description: "Mouse de alta precisão 16000 DPI com 8 botões programáveis",
     description: "Mouse sem fio de alta precisão com sensor óptico de 16000 DPI, 8 botões programáveis e bateria recarregável de 60 horas.",
     price: 189.90,
     image_urls: [
@@ -76,6 +80,7 @@ export const mockProducts = [
     id: "demo-5",
     name: "Webcam Full HD StreamPro",
     slug: "webcam-streampro",
+    short_description: "Câmera Full HD 1080p com autofoco e microfone embutido",
     description: "Câmera web Full HD 1080p com microfone embutido, autofoco e correção automática de luz. Perfeita para videoconferências e streaming.",
     price: 349.90,
     image_urls: [
@@ -94,6 +99,7 @@ export const mockProducts = [
     id: "demo-6",
     name: "Carregador Wireless FastCharge 15W",
     slug: "carregador-fastcharge",
+    short_description: "Carregamento sem fio rápido 15W universal",
     description: "Base de carregamento sem fio com tecnologia de carga rápida de 15W. Compatível com smartphones, fones e smartwatches.",
     price: 129.90,
     image_urls: [
@@ -112,6 +118,7 @@ export const mockProducts = [
     id: "demo-7",
     name: "Power Bank 20000mAh UltraFast",
     slug: "powerbank-ultrafast",
+    short_description: "Bateria externa 20000mAh com carregamento rápido USB-C",
     description: "Bateria externa de alta capacidade com carregamento rápido USB-C PD e 3 portas de saída. Ideal para viagens e uso diário.",
     price: 199.90,
     image_urls: [
@@ -130,6 +137,7 @@ export const mockProducts = [
     id: "demo-8",
     name: "Suporte para Notebook Ergonômico",
     slug: "suporte-notebook-ergonomico",
+    short_description: "Suporte ajustável em alumínio com 6 níveis de altura",
     description: "Suporte ajustável em alumínio com 6 níveis de altura, ventilação integrada e design ergonômico para melhor postura.",
     price: 149.90,
     image_urls: [

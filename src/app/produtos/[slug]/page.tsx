@@ -39,9 +39,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
     notFound();
   }
 
+  // Adicionar categories para compatibilidade com ProductDetailsClient
+  const productWithCategories = {
+    ...product,
+    categories: null
+  };
+
   return (
     <div className="bg-background text-white">
-      <ProductDetailsClient product={product} />
+      <ProductDetailsClient product={productWithCategories as any} />
     </div>
   );
 }
