@@ -9,7 +9,8 @@ import FavoriteButton from "./FavoriteButton";
 import MandatoryLoginModal from "./auth/MandatoryLoginModal";
 import { useCart } from "@/contexts/CartContext";
 import { useRouter } from "next/navigation";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+// DEMO VERSION - Supabase auth disabled
+// import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { sanitizeHTML } from "@/lib/sanitize";
 
 type ProductWithCategoryAndProfile = Product & {
@@ -28,40 +29,18 @@ export default function ProductDetailsClient({
   const { addToCart, cart } = useCart();
   const router = useRouter();
   const [isAdding, setIsAdding] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showCartPreview, setShowCartPreview] = useState(false);
   const [imageError, setImageError] = useState(false);
-  const supabase = createClientComponentClient();
+  // DEMO VERSION - Auth disabled
+  // const supabase = createClientComponentClient();
 
-  // Verificar autenticação
+  // DEMO VERSION - Auth check disabled
   useEffect(() => {
-    // Verificar sessão inicial
-    const checkAuth = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      console.log("🔍 Auth check - Session:", session?.user?.email);
-      setIsAuthenticated(!!session?.user);
-    };
-
-    checkAuth();
-
-    // Escutar mudanças de autenticação
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log(
-        "🔄 Auth state changed - Event:",
-        _event,
-        "User:",
-        session?.user?.email
-      );
-      setIsAuthenticated(!!session?.user);
-    });
-
-    return () => subscription.unsubscribe();
-  }, [supabase.auth]);
+    console.log("🔄 [DEMO] Auth desabilitada - usuário não autenticado");
+    setIsAuthenticated(false);
+  }, []);
 
   const handleAddToCart = () => {
     // 🔒 Exigir login
