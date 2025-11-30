@@ -12,28 +12,28 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Tech4Loop - Conecte-se na estrada",
+  title: "Tech4Loop DEMO - Conecte-se na estrada",
   description:
-    "Acessórios tech de qualidade para o seu dia a dia e suas viagens.",
-  keywords: "intercomunicador, moto, tech, acessórios, bluetooth, capacete",
+    "Versão demonstrativa - Acessórios tech de qualidade para o seu dia a dia e suas viagens.",
+  keywords: "intercomunicador, moto, tech, acessórios, bluetooth, capacete, demo",
   authors: [{ name: "Tech4Loop" }],
   openGraph: {
     type: "website",
     locale: "pt_BR",
-    siteName: "Tech4Loop",
-    title: "Tech4Loop - Conecte-se na estrada",
+    siteName: "Tech4Loop Demo",
+    title: "Tech4Loop DEMO - Conecte-se na estrada",
     description:
-      "Acessórios tech de qualidade para o seu dia a dia e suas viagens.",
+      "Versão demonstrativa - Acessórios tech de qualidade para o seu dia a dia e suas viagens.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Tech4Loop - Conecte-se na estrada",
+    title: "Tech4Loop DEMO - Conecte-se na estrada",
     description:
-      "Acessórios tech de qualidade para o seu dia a dia e suas viagens.",
+      "Versão demonstrativa - Acessórios tech de qualidade para o seu dia a dia e suas viagens.",
   },
   robots: {
-    index: true,
-    follow: true,
+    index: false,
+    follow: false,
   },
 };
 
@@ -46,6 +46,10 @@ export default function RootLayout({
     <html lang="pt-BR">
       <body className={poppins.className}>
         <CartProvider>
+          {/* Banner Demo Global */}
+          <div className="bg-gradient-to-r from-yellow-500 to-orange-500 text-black py-2 px-4 text-center text-sm font-bold">
+            🎭 VERSÃO DEMO - Este é um site demonstrativo. Nenhum pagamento real será processado.
+          </div>
           <Header />
           <main className="pt-20">{children}</main>
           <Footer />

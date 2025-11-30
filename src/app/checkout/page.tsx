@@ -1,23 +1,24 @@
 import { redirect } from "next/navigation";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
 import CheckoutCartForm from "@/components/checkout/CheckoutCartForm";
 
 export const metadata = {
-  title: "Checkout - Tech4Loop",
-  description: "Finalize sua compra com segurança",
+  title: "Checkout - Tech4Loop DEMO",
+  description: "Finalize sua compra com segurança - Versão Demonstração",
 };
 
 export default async function CheckoutPage() {
-  // Verificar autenticação (opcional - pode permitir checkout como convidado)
-  const supabase = createServerComponentClient({ cookies });
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // VERSÃO DEMO: Checkout sem autenticação obrigatória
 
   return (
     <div className="min-h-screen bg-gray-950 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
+        {/* Demo Banner */}
+        <div className="mb-6 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+          <p className="text-sm text-yellow-400 text-center">
+            🎭 <strong>VERSÃO DEMO</strong> - Este é um checkout simulado. Nenhum pagamento real será processado.
+          </p>
+        </div>
+
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-neon-blue to-electric-purple">
@@ -59,24 +60,19 @@ export default async function CheckoutPage() {
         </div>
 
         {/* Formulário de Checkout */}
-        <CheckoutCartForm userEmail={user?.email} />
+        <CheckoutCartForm userEmail={undefined} />
 
         {/* Selo de Segurança */}
         <div className="mt-8 text-center">
           <div className="inline-flex items-center gap-4 px-6 py-3 bg-gray-900/50 border border-gray-800 rounded-xl">
             <div className="flex items-center gap-2 text-sm text-gray-400">
               <span className="text-green-500">🔒</span>
-              <span>Pagamento 100% Seguro</span>
+              <span>Checkout Simulado</span>
             </div>
             <div className="w-px h-6 bg-gray-700"></div>
             <div className="flex items-center gap-2 text-sm text-gray-400">
-              <span>💳</span>
-              <span>Mercado Pago</span>
-            </div>
-            <div className="w-px h-6 bg-gray-700"></div>
-            <div className="flex items-center gap-2 text-sm text-gray-400">
-              <span>📱</span>
-              <span>PIX</span>
+              <span>🎭</span>
+              <span>Versão Demo</span>
             </div>
           </div>
         </div>

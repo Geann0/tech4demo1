@@ -1,6 +1,7 @@
 {
-  "name": "tech4loop-site",
-  "version": "0.1.0",
+  "name": "tech4loop-demo",
+  "version": "1.0.0-demo",
+  "description": "E-commerce demo moderno de acessórios tech - Versão demonstrativa sem integrações externas",
   "private": true,
   "scripts": {
     "dev": "next dev",

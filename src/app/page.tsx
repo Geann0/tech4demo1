@@ -2,9 +2,8 @@ import BlackFridayBanner from "@/components/home/BlackFridayBanner";
 import Link from "next/link";
 import Image from "next/image";
 import WhatsAppButton from "@/components/WhatsAppButton";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
 import { Product } from "@/types";
+import { mockProducts } from "@/lib/mockData";
 
 export const dynamic = "force-dynamic";
 
@@ -24,38 +23,10 @@ const whyUsItems = [
 ];
 
 export default async function HomePage() {
-  const supabase = createServerComponentClient({ cookies });
-
-  // Destaques: Apenas produtos Tech4Loop
-  const { data: featuredProductsData } = await supabase
-    .from("products")
-    .select(
-      "*, profiles!products_partner_id_fkey(whatsapp_number, service_regions)"
-    )
-    .is("partner_id", null) // Pega Tech4Loop ou parceiro nulo
-    .limit(3);
-  const featuredProducts: Product[] = featuredProductsData || [];
-
-  // Novidades: Todos os produtos recentes
-  const { data: newProductsData } = await supabase
-    .from("products")
-    .select(
-      "*, profiles!products_partner_id_fkey(whatsapp_number, service_regions)"
-    )
-    .order("created_at", { ascending: false })
-    .limit(4);
-  const newProducts: Product[] = newProductsData || [];
-
-  // Produto em destaque para a seção superior
-  const { data: productsForFeatured } = await supabase
-    .from("products")
-    .select(
-      "*, profiles!products_partner_id_fkey(whatsapp_number, service_regions)"
-    )
-    .is("partner_id", null)
-    .order("created_at", { ascending: false })
-    .limit(4);
-  const products = productsForFeatured || [];
+  // VERSÃO DEMO: Usando dados mock em vez de Supabase
+  const featuredProducts: Product[] = mockProducts.filter(p => p.is_featured).slice(0, 3);
+  const newProducts: Product[] = mockProducts.slice(0, 4);
+  const products = mockProducts;
   const featuredProduct = products.find((p) => p.is_featured) || products[0];
 
   return (

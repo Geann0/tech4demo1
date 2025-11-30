@@ -1,9 +1,8 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import ProductDetailsClient from "@/components/ProductDetailsClient";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
 import { Product } from "@/types";
+import { mockProducts } from "@/lib/mockData";
 
 export const dynamic = "force-dynamic";
 
@@ -17,12 +16,8 @@ type ProductPageProps = {
 export async function generateMetadata({
   params,
 }: ProductPageProps): Promise<Metadata> {
-  const supabase = createServerComponentClient({ cookies });
-  const { data: product } = await supabase
-    .from("products")
-    .select("*")
-    .eq("slug", params.slug)
-    .single();
+  // VERSÃO DEMO: Buscar em dados mock
+  const product = mockProducts.find(p => p.slug === params.slug);
 
   if (!product) {
     return {
@@ -32,18 +27,13 @@ export async function generateMetadata({
 
   return {
     title: product.name,
-    description: product.short_description,
+    description: product.description,
   };
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
-  const supabase = createServerComponentClient({ cookies });
-
-  const { data: product } = await supabase
-    .from("products")
-    .select("*, categories(name)")
-    .eq("slug", params.slug)
-    .single();
+  // VERSÃO DEMO: Buscar produto em dados mock
+  const product = mockProducts.find(p => p.slug === params.slug);
 
   if (!product) {
     notFound();

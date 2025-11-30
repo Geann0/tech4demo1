@@ -14,7 +14,8 @@ import {
   loadCheckoutData,
   calculateShipping,
 } from "@/lib/checkoutUtils";
-import { processCartCheckout } from "@/app/checkout/cartActions";
+// VERSÃO DEMO: Usando cartActions simulado
+import { processCartCheckout } from "@/app/checkout/cartActions-demo";
 
 function SubmitButton({
   paymentMethod,

@@ -57,6 +57,13 @@ const nextConfig = {
         port: "",
         pathname: "/storage/v1/object/public/**",
       },
+      // VERSÃO DEMO: Adicionar Unsplash para imagens mock
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        port: "",
+        pathname: "/**",
+      },
     ],
   },
 

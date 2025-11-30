@@ -1,41 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
-import type { User } from "@supabase/supabase-js";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [user, setUser] = useState<User | null>(null);
-  const supabase = createClientComponentClient();
+  // VERSÃO DEMO: Sem autenticação real
+  const user = null;
   const router = useRouter();
 
-  useEffect(() => {
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    // Pega a sessão inicial
-    const getInitialSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      setUser(session?.user ?? null);
-    };
-    getInitialSession();
-
-    return () => subscription.unsubscribe();
-  }, [supabase.auth]);
-
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    // VERSÃO DEMO: Logout simulado
     router.push("/");
     router.refresh();
   };
