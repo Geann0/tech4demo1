@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Resend } from "resend";
 import {
   checkRateLimit,
   getIdentifier,
   STRICT_RATE_LIMIT,
 } from "@/lib/rateLimit";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// DEMO VERSION - Email sending disabled
 const supportEmail = "suporte.tech4loop@gmail.com";
 
 export async function POST(req: NextRequest) {
@@ -39,24 +38,21 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    await resend.emails.send({
-      from: "onboarding@resend.dev", // Para produção, use um domínio verificado. Ex: 'Contato <contato@tech4loop.com>'
-      to: supportEmail,
+    // Demo mode: Log contact form data instead of sending email
+    console.log("Demo: Contact form submission", {
+      name,
+      email,
+      phone,
       subject: subject || "Novo Contato do Site Tech4Loop",
-      reply_to: email,
-      html: `
-        <p><strong>Nome:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        ${phone ? `<p><strong>Telefone:</strong> ${phone}</p>` : ""}
-        <hr />
-        <p><strong>Mensagem:</strong></p>
-        <p>${message.replace(/\n/g, "<br>")}</p>
-      `,
+      message
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ 
+      success: true,
+      message: "Demo mode: Contact form submission logged (email not sent)"
+    });
   } catch (error) {
-    console.error("Erro ao enviar email:", error);
+    console.error("Erro ao processar contato:", error);
     return NextResponse.json(
       { error: "Erro ao enviar a mensagem." },
       { status: 500 }

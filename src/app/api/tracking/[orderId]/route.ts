@@ -15,7 +15,7 @@ export async function GET(
       created_at: new Date().toISOString(),
       estimated_delivery: null,
       events: [],
-      message: "Demo mode: Order tracking is disabled"
+      message: "Demo mode: Order tracking is disabled",
     });
   } catch (error) {
     console.error("Erro ao buscar rastreamento:", error);

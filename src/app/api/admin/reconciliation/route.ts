@@ -12,9 +12,9 @@ export async function GET(request: NextRequest) {
 
   try {
     // Mock reconciliation data
-    return NextResponse.json({ 
+    return NextResponse.json({
       items: [],
-      message: "Demo mode: Reconciliation is disabled"
+      message: "Demo mode: Reconciliation is disabled",
     });
   } catch (error) {
     console.error("Erro na reconciliação:", error);
