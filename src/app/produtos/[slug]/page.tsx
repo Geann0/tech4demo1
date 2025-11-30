@@ -17,7 +17,7 @@ export async function generateMetadata({
   params,
 }: ProductPageProps): Promise<Metadata> {
   // VERSÃO DEMO: Buscar em dados mock
-  const product = mockProducts.find(p => p.slug === params.slug);
+  const product = mockProducts.find((p) => p.slug === params.slug);
 
   if (!product) {
     return {
@@ -33,7 +33,7 @@ export async function generateMetadata({
 
 export default async function ProductPage({ params }: ProductPageProps) {
   // VERSÃO DEMO: Buscar produto em dados mock
-  const product = mockProducts.find(p => p.slug === params.slug);
+  const product = mockProducts.find((p) => p.slug === params.slug);
 
   if (!product) {
     notFound();
@@ -42,7 +42,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   // Adicionar categories para compatibilidade com ProductDetailsClient
   const productWithCategories = {
     ...product,
-    categories: null
+    categories: null,
   };
 
   return (
