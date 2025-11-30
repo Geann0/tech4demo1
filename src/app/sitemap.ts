@@ -1,28 +1,19 @@
+// DEMO VERSION - Sitemap com dados mock
 import { MetadataRoute } from "next";
-import { createClient } from "@supabase/supabase-js";
+import { mockProducts } from "@/lib/mockData";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  console.log("🔄 [DEMO] Gerando sitemap com produtos mock");
 
-  // Buscar produtos ativos
-  const { data: products } = await supabase
-    .from("products")
-    .select("slug, updated_at, created_at")
-    .eq("status", "active")
-    .order("created_at", { ascending: false });
-
-  const productUrls =
-    products?.map((product) => ({
-      url: `${baseUrl}/produtos/${product.slug}`,
-      lastModified: new Date(product.updated_at || product.created_at),
-      changeFrequency: "weekly" as const,
-      priority: 0.8,
-    })) || [];
+  // Usar produtos mock
+  const productUrls = mockProducts.map((product) => ({
+    url: `${baseUrl}/produtos/${product.slug}`,
+    lastModified: new Date(product.updated_at),
+    changeFrequency: "weekly" as const,
+    priority: 0.8,
+  }));
 
   // Rotas estáticas
   return [

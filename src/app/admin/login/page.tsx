@@ -1,24 +1,15 @@
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+// DEMO VERSION - Admin Login Desabilitado
 import { signIn } from "@/app/auth/actions";
 import Link from "next/link";
+
+export const dynamic = "force-dynamic";
 
 export default async function LoginPage({
   searchParams,
 }: {
   searchParams: { message?: string; registered?: string; reset?: string };
 }) {
-  const supabase = createServerComponentClient({ cookies });
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  if (session) {
-    // Se já houver uma sessão, redireciona para o dashboard.
-    // A lógica principal de redirecionamento está no Server Action e no middleware.
-    return redirect("/admin/dashboard");
-  }
+  console.log("🔄 [DEMO] Admin login page - autenticação desabilitada");
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">

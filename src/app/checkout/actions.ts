@@ -18,9 +18,10 @@ export async function processCheckout(
   formData: FormData
 ): Promise<CheckoutState> {
   console.log(" [DEMO] Tentativa de checkout bloqueada - Demo mode ativo");
-  
+
   return {
-    error: " Modo Demo: O checkout está desabilitado nesta versão de demonstração. Esta é uma aplicação de portfólio sem funcionalidade de pagamento real.",
+    error:
+      " Modo Demo: O checkout está desabilitado nesta versão de demonstração. Esta é uma aplicação de portfólio sem funcionalidade de pagamento real.",
     success: false,
   };
 }
