@@ -1,41 +1,77 @@
-# Site Tech4Loop
+# 🎭 Tech4Loop - Versão DEMO
 
-Este é o repositório para o site oficial da Tech4Loop.
+[![Demo Version](https://img.shields.io/badge/version-1.0.0--demo-yellow)](https://github.com/Geann0/Tech4DEMO)
+[![Next.js](https://img.shields.io/badge/Next.js-14.2.3-black)](https://nextjs.org/)
+[![License](https://img.shields.io/badge/license-MIT%20Demo-blue)](LICENSE-DEMO.md)
 
-## Sobre o Projeto
+> **E-commerce moderno de acessórios tech - Versão demonstrativa para portfólio**
 
-O projeto é um site de e-commerce desenvolvido para vender acessórios de tecnologia, com foco em conversão via WhatsApp e um design moderno e responsivo.
+## 🎯 Sobre o Projeto
 
-### Nota sobre a Estrutura de Pastas
+Tech4Loop Demo é uma **versão demonstrativa completa** de um e-commerce moderno focado em acessórios de tecnologia. Desenvolvido com Next.js 14, React 18 e TypeScript, apresenta todas as funcionalidades visuais e de interface sem necessidade de configurar APIs externas.
 
-Este projeto é construído com **Next.js**, um framework moderno para a criação de **sites**.
+**⚠️ IMPORTANTE**: Esta é uma versão DEMO. Nenhum pagamento real é processado e os produtos são fictícios.
 
-A estrutura do projeto inclui uma pasta chamada `src/app`. É importante notar que, no contexto do Next.js, **`app` refere-se a "aplicação web" (o site)**, e não a um aplicativo móvel (para celular). Esta é a convenção padrão do framework para organizar as páginas e componentes do site.
+## ✨ Funcionalidades
 
-Portanto, o desenvolvimento está correto e focado na entrega de um site web, conforme o briefing.
+- 🛍️ **Catálogo Completo** - 8 produtos fictícios com imagens de alta qualidade
+- 🛒 **Sistema de Carrinho** - Adicionar, remover e atualizar quantidades
+- 💳 **Checkout Simulado** - Formulário completo com validações (sem pagamento real)
+- 📱 **100% Responsivo** - Otimizado para mobile, tablet e desktop
+- 🎨 **Design Moderno** - Interface dark com tema neon customizado
+- ⚡ **Performance** - Otimizado para Lighthouse 95+
 
----
-
-## Como Rodar o Projeto Localmente
-
-Para visualizar e testar o site em sua máquina, siga os passos abaixo.
-
-### 1. Instale as Dependências
-
-Abra o terminal na pasta do projeto e execute o comando:
+## 🚀 Início Rápido
 
 ```bash
+# Clone o repositório
+git clone https://github.com/Geann0/Tech4DEMO.git
+cd Tech4DEMO
+
+# Instale as dependências
 npm install
-```
 
-Este comando irá baixar todas as ferramentas necessárias para o site funcionar (Next.js, React, etc.).
+# Configure o ambiente (OBRIGATÓRIO)
+Copy-Item .env.demo .env.local  # Windows
+# ou: cp .env.demo .env.local    # Linux/Mac
 
-### 2. Inicie o Servidor de Desenvolvimento
-
-Após a instalação, execute o seguinte comando:
-
-```bash
+# Inicie o servidor
 npm run dev
 ```
 
-O site estará disponível em [http://localhost:3000](http://localhost:3000) no seu navegador. O servidor recarrega automaticamente sempre que você fizer uma alteração nos arquivos.
+**Acesse**: http://localhost:3000
+
+> ⚠️ O arquivo `.env.local` é obrigatório para evitar erros!
+
+## 📚 Documentação Completa
+
+- 📖 [**README-DEMO.md**](README-DEMO.md) - Guia completo do projeto
+- 🔧 [**SETUP.md**](SETUP.md) - Instalação detalhada e troubleshooting
+- 🚀 [**GITHUB-DEPLOY.md**](GITHUB-DEPLOY.md) - Como fazer deploy
+- 🖼️ [**IMAGES.md**](IMAGES.md) - Configuração de imagens
+- ⚡ [**START.md**](START.md) - Início rápido
+- 📄 [**LICENSE-DEMO.md**](LICENSE-DEMO.md) - Termos de uso
+
+## 🛠️ Stack
+
+- Next.js 14.2.3 • React 18 • TypeScript 5 • Tailwind CSS 3.4
+
+## 💻 Comandos
+
+```bash
+npm run dev      # Desenvolvimento
+npm run build    # Build de produção
+npm run lint     # Linter
+```
+
+## 📄 Licença
+
+Versão DEMO - Uso permitido para portfólio e estudos. Veja [LICENSE-DEMO.md](LICENSE-DEMO.md).
+
+## 👤 Autor
+
+**Geann0** - [@Geann0](https://github.com/Geann0)
+
+---
+
+**⭐ Gostou? Dê uma estrela no projeto!**
